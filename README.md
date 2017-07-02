@@ -5,6 +5,10 @@ This program is a clone of [PSR for Windows](https://blogs.msdn.microsoft.com/pa
 
 The main differences are that this only runs on Linux, that it records your keystrokes too (!), and that it saves the output as standard html (base64-uri-encoded images) rather than mhtml. This allows for easy editing of the resultant file, such as to remove passwords you typed (which is why psr doesn't record keystrokes in the first place).
 
+# Installation
+
+See the [Releases Page](https://github.com/nonnymoose/xsr/releases).
+
 # Usage
 
 ```
