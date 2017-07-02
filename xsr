@@ -99,7 +99,7 @@ sub finish {
 					$curmousex = $1 - 6; # offset of cursor in image is 6, 3
 					$curmousey = $2 - 3;
 				} else {last;}
-				system("composite -geometry +$curmousex+$curmousey /home/daniel/Downloads/Cursor.png $i.$imgext $i.$imgext") and warn "Had a problem adding the cursor to image $i\n"; # shell has reversed error codes
+				system("composite -geometry +$curmousex+$curmousey /usr/share/xsr/Cursor.png $i.$imgext $i.$imgext") and warn "Had a problem adding the cursor to image $i\n"; # shell has reversed error codes
 			}
 			close "MOUSEIN";
 		}
