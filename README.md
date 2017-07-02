@@ -8,6 +8,7 @@ The main differences are that this only runs on Linux, that it records your keys
 # Installation
 
 See the [Releases Page](https://github.com/nonnymoose/xsr/releases).
+Make sure you have `scrot` installed; I recommend that you have `imagemagick` and `xdotool` installed as well (to add pointer to screenshots).
 
 # Usage
 
