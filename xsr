@@ -206,7 +206,7 @@ print <<"/html";
 
 open "XIN", "-|", "xinput --test-xi2 --root"; # execute xinput with the monitoring options
 
-while (<XIN>) {
+MAINLOOP: while (<XIN>) {
 	if (/^EVENT type.*\((.*)\)/) {$e = $1} # store event type in $e
 	elsif (/detail: (\d+)/) {$d=$1} # store event detail in $d
 	elsif (/flags: /) { # process Raw mouse events (for some reason, maximized windows don't return standard motion events)
@@ -247,7 +247,7 @@ while (<XIN>) {
 		}
 		elsif ($e =~ /^RawButtonRelease/){
 			handletypingstate();
-			if (gettimeofday() - $buttondown >= .075 && $movedsince) { # if wwe have moved the mouse since clicking and it's been more than 0.075 seconds, recognize it as a click and drag
+			if (gettimeofday() - $buttondown >= .075 && $movedsince) { # if we have moved the mouse since clicking and it's been more than 0.075 seconds, recognize it as a click and drag
 																																 # This is very similar to the system default
 				my $shotnumber = takescreenshot();
 				print "<div class=\"instruction\">\n<div class=\"title\">... and drag</div>\n<img src=\"$shotnumber.$imgext\" />\n</div>\n";
@@ -262,7 +262,6 @@ while (<XIN>) {
 			if ($key =~ /$mregex/i) { # skip this iteration if the key is a modifier
 				next;
 			}
-			if (! $typing) {print "<div class=\"instruction\">\n<div class=\"title\">Type: "; $typing = 1} # print a type instruction if not already typing, then note that already typing from now on
 			my @mods;
 			for (0..$#m) {
 				if (hex($m) & (1<<$_)) { # this is the tricky part
@@ -289,6 +288,8 @@ while (<XIN>) {
 					}
 				}
 			}
+			if ($key =~ /^break$/i) {last MAINLOOP;} # quit if the user presses Break
+			if (! $typing) {print "<div class=\"instruction\">\n<div class=\"title\">Type: "; $typing = 1} # print a type instruction if not already typing, then note that already typing from now on
 			if (@mods > 0) {
 				for (0..$#mods) {print "<kbd>$mods[$_]</kbd>+"} # if there are modifiers in effect, print as a sequence of keys
 				print "<kbd>$key</kbd>";
@@ -307,3 +308,4 @@ while (<XIN>) {
 	  }
 	}
 }
+finish();
