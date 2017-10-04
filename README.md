@@ -28,5 +28,6 @@ To quit, press `Break` (usually on top of `Pause`).
 
  - Make a `deb`
  - Make a PPA
+ - Make an `ebuild`
  - Clean up the code to make it run in strict mode  
 ✓ **Make it quit on a sequence of keys, rather than having to go to the terminal and kill it**
