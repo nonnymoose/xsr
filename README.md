@@ -30,3 +30,4 @@ To quit, press `Break` (usually on top of `Pause`).
  - Make a PPA
  - Clean up the code to make it run in strict mode  
 ✓ **Make it quit on a sequence of keys, rather than having to go to the terminal and kill it**
+ - Adding comments
