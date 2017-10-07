@@ -24,6 +24,3 @@ src_install() {
 	insinto /usr/share/xsr
 	doins Cursor.png
 }
-
-
-RESTRICT="primaryuri"
