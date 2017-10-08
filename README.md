@@ -22,4 +22,4 @@ Options:
   -c|--image-extension ext	Extension of image output (png or jpg)
   -h|--help			Print this message
 ```
-To quit, press `Break` (usually on top of `Pause`).
+To quit, press `Break` (usually on top of `Pause`). `Ctrl`+`C` works most of time fine too, although xsr will record that keypress.
