@@ -14,6 +14,7 @@ $editimages = 0;
 $imgext="jpg";
 $countdown = 1;
 $screeni = 0; # counter for screenshot number
+$nomouse = 0;
 
 sub usage {
 	return <<endusage;
@@ -24,6 +25,7 @@ Options:
   -o|--out outfile		Output file name (also can be first argument)
   -e|--edit-images-before-save	Edit images before saving file
   -c|--image-extension ext	Extension of image output (png or jpg)
+	--no-mouse			Do not add mouse to screenshots
   --countdown			Display countdown (default)
   --nocountdown			Don't display countdown
   -h|--help			Print this message
@@ -31,7 +33,8 @@ Options:
 endusage
 }
 
-GetOptions ("out|o=s" => \$outfile, "edit-images-before-save|e" => \$editimages, "image-extension|c=s" => \$imgext, "verbose|v" => \$verbose, "countdown!" => \$countdown) or die "$!\n" . usage();
+
+GetOptions ("out|o=s" => \$outfile, "edit-images-before-save|e" => \$editimages, "image-extension|c=s" => \$imgext, "verbose|v" => \$verbose, "countdown!" => \$countdown, "no-mouse" => \$nomouse) or die "$!\n" . usage();
 
 if (@ARGV == 1) {
 	$outfile = $ARGV[0];
@@ -57,7 +60,8 @@ chdir $tmpdir or die "$! Is /tmp mounted?\n";
 # check for features, warn and do not use if false 6, 3
 $xdotool = `which xdotool`;
 chomp($xdotool);
-$xdotool or warn "xdotool unavailable: mouse cursor will not appear in screenshots\n";
+if ($nomouse) {$xdotool = "";}
+else {$xdotool or warn "xdotool unavailable: mouse cursor will not appear in screenshots\n";}
 $composite = `which composite`;
 chomp($composite);
 $composite or warn "composite unavailable: mouse cursor will not appear in screenshots\n";
