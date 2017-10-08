@@ -12,8 +12,8 @@ $outfile = "Untitled Recording.html";
 $verbose = 0;
 $editimages = 0;
 $imgext="jpg";
-$countdown = 1;
 $focusedcap = 0;
+$countdown = 5;
 $screeni = 0; # counter for screenshot number
 $nomouse = 0;
 
@@ -27,15 +27,16 @@ Options:
   -e|--edit-images-before-save	Edit images before saving file
   -c|--image-extension ext	Extension of image output (png or jpg)
 	--no-mouse			Do not add mouse to screenshots
-  --countdown			Display countdown (default)
-  --nocountdown			Don't display countdown
   -u|--capture-focused		Captured the focused window only
+  --no-mouse			Do not add mouse to screenshots
+  --countdown[=seconds]		Display countdown (default 5)
+  --no-countdown			Don't display countdown
   -h|--help			Print this message
 
 endusage
 }
 
-GetOptions ("out|o=s" => \$outfile, "edit-images-before-save|e" => \$editimages, "image-extension|c=s" => \$imgext, "capture-focused|u" => \$focusedcap, "verbose|v" => \$verbose, "countdown!" => \$countdown, "no-mouse" => \$nomouse) or die "$!\n" . usage();
+GetOptions ("out|o=s" => \$outfile, "edit-images-before-save|e" => \$editimages, "image-extension|c=s" => \$imgext, "capture-focused|u" => \$focusedcap, "verbose|v" => \$verbose, "countdown:i" => \$countdown, "no-countdown" => sub {$countdown = 0}, "no-mouse" => \$nomouse) or die "$!\n" . usage();
 
 if (@ARGV == 1) {
 	$outfile = $ARGV[0];
@@ -141,7 +142,7 @@ sub finish {
 
 if ($countdown) {
 	print "Starting in ";
-	for ($i = 5; $i > 0; $i--) {
+	for ($i = $countdown; $i > 0; $i--) {
 		print $i . "\b";
 		STDOUT->flush();
 		sleep 1;
