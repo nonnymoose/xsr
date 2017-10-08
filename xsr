@@ -13,6 +13,7 @@ $verbose = 0;
 $editimages = 0;
 $imgext="jpg";
 $countdown = 1;
+$focusedcap = 0;
 $screeni = 0; # counter for screenshot number
 $nomouse = 0;
 
@@ -28,13 +29,13 @@ Options:
 	--no-mouse			Do not add mouse to screenshots
   --countdown			Display countdown (default)
   --nocountdown			Don't display countdown
+  -u|--capture-focused		Captured the focused window only
   -h|--help			Print this message
 
 endusage
 }
 
-
-GetOptions ("out|o=s" => \$outfile, "edit-images-before-save|e" => \$editimages, "image-extension|c=s" => \$imgext, "verbose|v" => \$verbose, "countdown!" => \$countdown, "no-mouse" => \$nomouse) or die "$!\n" . usage();
+GetOptions ("out|o=s" => \$outfile, "edit-images-before-save|e" => \$editimages, "image-extension|c=s" => \$imgext, "capture-focused|u" => \$focusedcap, "verbose|v" => \$verbose, "countdown!" => \$countdown, "no-mouse" => \$nomouse) or die "$!\n" . usage();
 
 if (@ARGV == 1) {
 	$outfile = $ARGV[0];
@@ -195,7 +196,7 @@ sub handletypingstate { # called by non-typing events
 
 sub takescreenshot {
 	system("xdotool getmouselocation >> mousegrabs &") if $xdotool && $composite;
-	system("scrot $screeni.$imgext &");
+	system("scrot".( $focusedcap ? " --focused" : "" )." $screeni.$imgext &");
 	return $screeni++;
 }
 
