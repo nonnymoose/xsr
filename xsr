@@ -30,6 +30,8 @@ Options:
   --nocountdown			Don't display countdown
   -h|--help			Print this message
 
+If outfile is - (a dash), the program writes to stdout
+
 endusage
 }
 
