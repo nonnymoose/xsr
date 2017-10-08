@@ -113,8 +113,12 @@ sub finish {
 			<STDIN>
 		}
 
-		open "ASSOCFILE", "<", "tmpassoconly.html"; # this file contains only image associations, not base64
-		open "FINALFILE", ">", $outfile; # this file will contain base64
+		# this file contains only image associations, not base64
+		open "ASSOCFILE", "<", "tmpassoconly.html" or warn "Couldn't open image associations: The resulting file would require manual edit";
+
+		# this file will contain base64
+		open "FINALFILE", ">", $outfile or die "Couldn't open final output file";
+
 		select FINALFILE;
 		while (<ASSOCFILE>) {
 			$_ =~ s/<img src=\"([^\"]+)\" \/>/"<img src=\"data:$mimetype;base64," . convertToB64($1) . "\" \/>"/gie; # replace <img> tags' src attr with a base64 uri
@@ -122,6 +126,7 @@ sub finish {
 		}
 		close ASSOCFILE;
 		close FINALFILE;
+
 		chdir $originaldir;
 		copy "$tmpdir/$outfile", $outfile; # put the output in the original directory
 		remove_tree $tmpdir;
@@ -146,7 +151,9 @@ while (<X>) {
 		$K{$1}=$3 if $3; # store shift in K, a hash
 	}
 }
-open "X", "-|", "xmodmap -pm"; <X>;<X>; # open modmap
+
+# open modmap
+open "X", "-|", "xmodmap -pm" or warn "Could not open modifier map: Special keypresses would mess"; <X>;<X>;
 while (<X>) {if (/^(\w+)\s+(\w*)/){($k=$2)=~s/_[LR]$//;$m[$i++]=$k||$1}} # get a list of modifiers and stick it in an array
 close X;
 $mregex = "(shift|meta|alt|super|mod|lock|control)"; # a regex to tell whether a KeyPress is a modifier or not
@@ -188,7 +195,8 @@ sub takescreenshot {
 	return $screeni++;
 }
 
-open "FOUT", ">", "tmpassoconly.html"; # open output file (NOTE: no safety here! Watch out!)
+# open output file (NOTE: no safety here! Watch out!)
+open "FOUT", ">", "tmpassoconly.html" or warn "Could not open temporary output file - writing to stdout";
 select FOUT;
 
 # header
@@ -204,7 +212,8 @@ print <<"/html";
 		<div class="title">$outfile_saveext</div>
 /html
 
-open "XIN", "-|", "xinput --test-xi2 --root"; # execute xinput with the monitoring options
+# execute xinput with the monitoring options
+open "XIN", "-|", "xinput --test-xi2 --root" or die "Unable to watch for X input events";
 
 MAINLOOP: while (<XIN>) {
 	if (/^EVENT type.*\((.*)\)/) {$e = $1} # store event type in $e
