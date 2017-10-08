@@ -12,6 +12,7 @@ $outfile = "Untitled Recording.html";
 $verbose = 0;
 $editimages = 0;
 $imgext="jpg";
+$countdown = 1;
 $screeni = 0; # counter for screenshot number
 $nomouse = 0;
 
@@ -25,12 +26,15 @@ Options:
   -e|--edit-images-before-save	Edit images before saving file
   -c|--image-extension ext	Extension of image output (png or jpg)
 	--no-mouse			Do not add mouse to screenshots
+  --countdown			Display countdown (default)
+  --nocountdown			Don't display countdown
   -h|--help			Print this message
 
 endusage
 }
 
-GetOptions ("out|o=s" => \$outfile, "edit-images-before-save|e" => \$editimages, "image-extension|c=s" => \$imgext, "verbose|v" => \$verbose, "no-mouse" => \$nomouse) or die "$!\n" . usage();
+
+GetOptions ("out|o=s" => \$outfile, "edit-images-before-save|e" => \$editimages, "image-extension|c=s" => \$imgext, "verbose|v" => \$verbose, "countdown!" => \$countdown, "no-mouse" => \$nomouse) or die "$!\n" . usage();
 
 if (@ARGV == 1) {
 	$outfile = $ARGV[0];
@@ -132,13 +136,15 @@ sub finish {
 	print STDOUT "\n";
 }
 
-print "Starting in ";
-for ($i = 5; $i > 0; $i--) {
-	print $i . "\b";
-	STDOUT->flush();
-	sleep 1;
+if ($countdown) {
+	print "Starting in ";
+	for ($i = 5; $i > 0; $i--) {
+		print $i . "\b";
+		STDOUT->flush();
+		sleep 1;
+	}
+	print "0\nStarted. (Why are you still here?)\n";
 }
-print "0\nStarted. (Why are you still here?)\n";
 
 
 # From here on out the code is inspired by this answer: https://unix.stackexchange.com/a/129171, posted by Stéphane Chazelas
