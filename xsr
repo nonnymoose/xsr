@@ -153,6 +153,7 @@ sub finish {
 		remove_tree $tmpdir;
 	}
 	print STDOUT "\n";
+	exit;
 }
 
 if ($countdown) {
