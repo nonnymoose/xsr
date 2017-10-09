@@ -36,7 +36,16 @@ Options:
 endusage
 }
 
-GetOptions ("out|o=s" => \$outfile, "edit-images-before-save|e" => \$editimages, "image-extension|c=s" => \$imgext, "capture-focused|u" => \$focusedcap, "verbose|v" => \$verbose, "countdown:i" => \$countdown, "no-countdown" => sub {$countdown = 0}, "no-mouse" => \$nomouse) or die "$!\n" . usage();
+GetOptions (
+	"out|o=s" => \$outfile,
+	"edit-images-before-save|e" => \$editimages,
+	"image-extension|c=s" => \$imgext,
+	"capture-focused|u" => \$focusedcap,
+	"verbose|v" => \$verbose,
+	"countdown:i" => \$countdown,
+	"no-countdown" => sub {$countdown = 0},
+	"no-mouse" => \$nomouse
+	) or die "$!\n" . usage();
 
 if (@ARGV == 1) {
 	$outfile = $ARGV[0];
