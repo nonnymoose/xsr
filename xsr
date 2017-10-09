@@ -217,7 +217,7 @@ sub takescreenshot {
 }
 
 # open output file (NOTE: no safety here! Watch out!)
-open "FOUT", ">", "tmpassoconly.html" or warn "Could not open temporary output file - writing to stdout";
+open "FOUT", ">", "tmpassoconly.html" or warn "Could not open temporary output file";
 select FOUT;
 
 # header
