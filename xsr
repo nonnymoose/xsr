@@ -17,7 +17,6 @@ $focusedcap = 0;
 $countdown = 5;
 $screeni = 0; # counter for screenshot number
 $nomouse = 0;
-$helprequested = 0; # --help specified
 
 sub usage {
 	return <<endusage;
