@@ -10,6 +10,7 @@ use Getopt::Long;
 
 $outfile = "Untitled Recording.html";
 $verbose = 0;
+$quiet = 0;
 $editimages = 0;
 $imgext="jpg";
 $focusedcap = 0;
@@ -28,6 +29,7 @@ Options:
   -e|--edit-images-before-save	Edit images before saving file
   -c|--image-extension ext	Extension of image output (png or jpg)
   -u|--capture-focused		Captured the focused window only
+	-q|--quiet			Supress output to STDOUT
   --no-mouse			Do not add mouse to screenshots
   --countdown[=seconds]		Display countdown (default 5)
   --no-countdown		Don't display countdown
@@ -42,6 +44,7 @@ GetOptions (
 	"image-extension|c=s" => \$imgext,
 	"capture-focused|u" => \$focusedcap,
 	"verbose|v" => \$verbose,
+	"quiet|q" => \$quiet,
 	"countdown:i" => \$countdown,
 	"no-countdown" => sub {$countdown = 0},
 	"no-mouse" => \$nomouse,
@@ -59,6 +62,8 @@ else {
 	print usage();
 	die "Too many arguments.\n";
 }
+
+if ($quiet) {$countdown = 0;}
 
 $outfilename = $outfile;
 $outfilename =~ s/^.*\///;
@@ -96,7 +101,7 @@ sub convertToB64 {
 }
 
 sub finish {
-	print STDOUT "\n";
+	print STDOUT "\n" if not $quiet;
 	if (FOUT) {
 		handletypingstate();
 		print <<"/html";
@@ -130,7 +135,7 @@ sub finish {
 			$xdgopen = `which xdg-open`;
 			chomp $xdgopen;
 			if ($xdgopen) {system("xdg-open \"$tmpdir\"")}
-			print STDOUT "Initial image processing complete. If you would like to edit the images before the file is saved, they are located in $tmpdir. Press return when finished.\n";
+			print STDOUT "Initial image processing complete. If you would like to edit the images before the file is saved, they are located in $tmpdir. Press return when finished.\n" if not $quiet;
 			<STDIN>
 		}
 
@@ -147,7 +152,8 @@ sub finish {
 		copy "$tmpdir/tmpencoded.html", $outfile; # put the output in the original directory
 		remove_tree $tmpdir;
 	}
-	print STDOUT "\n";
+	print STDOUT "\n" if not $quiet;
+	exit;
 }
 
 if ($countdown) {
