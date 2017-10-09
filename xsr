@@ -82,8 +82,7 @@ chdir $tmpdir or die "$! Is /tmp mounted?\n";
 # check for features, warn and do not use if false 6, 3
 $xdotool = `which xdotool`;
 chomp($xdotool);
-if ($nomouse) {$xdotool = "";}
-else {$xdotool or warn "xdotool unavailable: mouse cursor will not appear in screenshots\n";}
+$xdotool or warn "xdotool unavailable: mouse cursor will not appear in screenshots\n";
 $composite = `which composite`;
 chomp($composite);
 $composite or warn "composite unavailable: mouse cursor will not appear in screenshots\n";
@@ -116,7 +115,7 @@ sub finish {
 		close FOUT;
 		close XIN;
 
-		if ($xdotool && $composite) {
+		if ($xdotool && $composite && not $nomouse) {
 			open "MOUSEIN", "<", "mousegrabs" or warn "Couldn't open mousegrabs: mouse will not appear in screenshots\n";
 			for ($i = 0; $i < $screeni; $i++) {
 				$curmouse = <MOUSEIN>;
@@ -211,7 +210,7 @@ sub handletypingstate { # called by non-typing events
 }
 
 sub takescreenshot {
-	system("xdotool getmouselocation >> mousegrabs &") if $xdotool && $composite;
+	system("xdotool getmouselocation >> mousegrabs &") if ($xdotool && $composite && not $nomouse);
 	system("scrot".( $focusedcap ? " --focused" : "" )." $screeni.$imgext &");
 	return $screeni++;
 }
