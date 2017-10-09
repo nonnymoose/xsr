@@ -135,7 +135,7 @@ sub finish {
 			$xdgopen = `which xdg-open`;
 			chomp $xdgopen;
 			if ($xdgopen) {system("xdg-open \"$tmpdir\"")}
-			print STDOUT "Initial image processing complete. If you would like to edit the images before the file is saved, they are located in $tmpdir. Press return when finished.\n" if not quiet;
+			print STDOUT "Initial image processing complete. If you would like to edit the images before the file is saved, they are located in $tmpdir. Press return when finished.\n" if not $quiet;
 			<STDIN>
 		}
 
