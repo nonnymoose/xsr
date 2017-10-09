@@ -16,6 +16,7 @@ $focusedcap = 0;
 $countdown = 5;
 $screeni = 0; # counter for screenshot number
 $nomouse = 0;
+$helprequested = 0; # --help specified
 
 sub usage {
 	return <<endusage;
@@ -43,8 +44,14 @@ GetOptions (
 	"verbose|v" => \$verbose,
 	"countdown:i" => \$countdown,
 	"no-countdown" => sub {$countdown = 0},
-	"no-mouse" => \$nomouse
+	"no-mouse" => \$nomouse,
+	"help|h" => \$helprequested
 	) or die "$!\n" . usage();
+
+if ($helprequested) {
+	print usage();
+	exit 0;
+}
 
 if (@ARGV == 1) {
 	$outfile = $ARGV[0];
