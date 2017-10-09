@@ -86,13 +86,16 @@ $tmpdir = `mktemp -d`;
 chomp	$tmpdir; # mktemp returns a newline
 chdir $tmpdir or die "$! Is /tmp mounted?\n";
 
-# check for features, warn and do not use if false 6, 3
-$xdotool = `which xdotool`;
-chomp($xdotool);
-$xdotool or warn "xdotool unavailable: mouse cursor will not appear in screenshots\n";
-$composite = `which composite`;
-chomp($composite);
-$composite or warn "composite unavailable: mouse cursor will not appear in screenshots\n";
+# check for features, warn and do not use if unavailable
+# only check if mouse will be used for first two
+if (not $nomouse) {
+	$xdotool = `which xdotool`;
+	chomp($xdotool);
+	$xdotool or warn "xdotool unavailable: mouse cursor will not appear in screenshots\n";
+	$composite = `which composite`;
+	chomp($composite);
+	$composite or warn "composite unavailable: mouse cursor will not appear in screenshots\n";
+}
 $scrot = `which scrot`;
 chomp($scrot);
 $scrot or die "scrot unavailable: cannot take screenshots\n";
