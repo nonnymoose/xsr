@@ -13,17 +13,9 @@ Make sure you have `scrot` installed; I recommend that you have `imagemagick` an
 # Usage
 
 ```
-Usage: xsr [options] [outfile]
-
-Options:
-
-  -o|--out outfile		Output file name (also can be first argument)
-  -e|--edit-images-before-save	Edit images before saving file
-  -c|--image-extension ext	Extension of image output (png or jpg)
-  -u|--capture-focused		Captured the focused window only
-  --no-mouse			Do not add mouse to screenshots
-  --countdown[=seconds]		Display countdown (default 5)
-  --no-countdown			Don't display countdown
-  -h|--help			Print this message
+m4_define([[[./xsr]]], [[[xsr]]])m4_dnl
+m4_changeword([\.\/_a-zA-Z0-9]+)m4_dnl
+USAGE
+m4_changeword([_a-zA-Z][_a-zA-Z0-9]*)m4_dnl
 ```
 To quit, press `Break` (usually on top of `Pause`). `Ctrl`+`C` works most of time fine too, although xsr will record that keypress.
