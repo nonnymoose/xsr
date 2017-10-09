@@ -140,7 +140,7 @@ sub finish {
 		}
 
 		open "ASSOCFILE", "<", "tmpassoconly.html"; # this file contains only image associations, not base64
-		open "FINALFILE", ">", $outfilename; # this file will contain base64
+		open "FINALFILE", ">", "tmpencoded.html"; # this file will contain base64
 		select FINALFILE;
 		while (<ASSOCFILE>) {
 			$_ =~ s/<img src=\"([^\"]+)\" \/>/"<img src=\"data:$mimetype;base64," . convertToB64($1) . "\" \/>"/gie; # replace <img> tags' src attr with a base64 uri
@@ -149,7 +149,7 @@ sub finish {
 		close ASSOCFILE;
 		close FINALFILE;
 		chdir $originaldir;
-		copy "$tmpdir/$outfilename", $outfile; # put the output in the original directory
+		copy "$tmpdir/tmpencoded.html", $outfile; # put the output in the original directory
 		remove_tree $tmpdir;
 	}
 	print STDOUT "\n";
