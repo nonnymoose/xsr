@@ -19,3 +19,9 @@ USAGE
 m4_changeword([_a-zA-Z][_a-zA-Z0-9]*)m4_dnl
 ```
 To quit, press `Break` (usually on top of `Pause`). `Ctrl`+`C` works most of time fine too, although xsr will record that keypress.
+
+# Notes for this file
+__Please don't edit this file (`README.md`) directly!__
+/* You should edit THIS file instead */
+Please edit rather `README.md.m4`, and run `make README.md` after.
+You can commit the generated changes in `README.md` along with the manual changes in `README.md.m4`.
