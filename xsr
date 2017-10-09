@@ -10,13 +10,18 @@ use Getopt::Long;
 
 $outfile = "Untitled Recording.html";
 $verbose = 0;
+$quiet = 0;
 $editimages = 0;
 $imgext="jpg";
 $focusedcap = 0;
 $countdown = 5;
 $screeni = 0; # counter for screenshot number
 $nomouse = 0;
-$helprequested = 0; # --help specified
+%mimetypes = (
+	"png", "image/png",
+	"jpg", "image/jpeg",
+	"jpeg", "image/jpeg"
+);
 
 sub usage {
 	return <<endusage;
@@ -26,11 +31,12 @@ Options:
 
   -o|--out outfile		Output file name (also can be first argument)
   -e|--edit-images-before-save	Edit images before saving file
-  -c|--image-extension ext	Extension of image output (png or jpg)
+  -c|--image-extension=ext	Extension of image output (png or jpg)
   -u|--capture-focused		Captured the focused window only
+  -q|--quiet			Supress output to STDOUT
   --no-mouse			Do not add mouse to screenshots
   --countdown[=seconds]		Display countdown (default 5)
-  --no-countdown			Don't display countdown
+  --no-countdown		Don't display countdown
   -h|--help			Print this message
 
 endusage
@@ -42,16 +48,13 @@ GetOptions (
 	"image-extension|c=s" => \$imgext,
 	"capture-focused|u" => \$focusedcap,
 	"verbose|v" => \$verbose,
+	"quiet|q" => \$quiet,
 	"countdown:i" => \$countdown,
 	"no-countdown" => sub {$countdown = 0},
 	"no-mouse" => \$nomouse,
-	"help|h" => \$helprequested
+	"help|h" => sub {print usage(); exit 0;}
 	) or die "$!\n" . usage();
 
-if ($helprequested) {
-	print usage();
-	exit 0;
-}
 
 if (@ARGV == 1) {
 	$outfile = $ARGV[0];
@@ -64,14 +67,18 @@ else {
 	die "Too many arguments.\n";
 }
 
+if ($quiet) {$countdown = 0;}
+
 $outfilename = $outfile;
 $outfilename =~ s/^.*\///;
 $outfilename_noext = $outfilename;
 $outfilename_noext =~ s/\.[^\.]*$//;
 
-if ($imgext == "png") {$mimetype = "image/png"}
-elsif ($imgext == "jpg") {$mimetype = "image/jpeg"}
-else {print usage(); die "Invalid file type $imagext.\n"}
+if (%mimetypes{$imgext}) {$mimetype = %mimetypes{$imgext};}
+else {
+	$accepted = "";
+	die "Invalid file type $imgext.\nAccepted file types are:\n" . join(", ", keys %mimetypes) . "\n";
+}
 
 # change to a temporary directory
 $originaldir = cwd;
@@ -79,14 +86,16 @@ $tmpdir = `mktemp -d`;
 chomp	$tmpdir; # mktemp returns a newline
 chdir $tmpdir or die "$! Is /tmp mounted?\n";
 
-# check for features, warn and do not use if false 6, 3
-$xdotool = `which xdotool`;
-chomp($xdotool);
-if ($nomouse) {$xdotool = "";}
-else {$xdotool or warn "xdotool unavailable: mouse cursor will not appear in screenshots\n";}
-$composite = `which composite`;
-chomp($composite);
-$composite or warn "composite unavailable: mouse cursor will not appear in screenshots\n";
+# check for features, warn and do not use if unavailable
+# only check if mouse will be used for first two
+if (not $nomouse) {
+	$xdotool = `which xdotool`;
+	chomp($xdotool);
+	$xdotool or warn "xdotool unavailable: mouse cursor will not appear in screenshots\n";
+	$composite = `which composite`;
+	chomp($composite);
+	$composite or warn "composite unavailable: mouse cursor will not appear in screenshots\n";
+}
 $scrot = `which scrot`;
 chomp($scrot);
 $scrot or die "scrot unavailable: cannot take screenshots\n";
@@ -101,7 +110,7 @@ sub convertToB64 {
 }
 
 sub finish {
-	print STDOUT "\n";
+	print STDOUT "\n" if not $quiet;
 	if (FOUT) {
 		handletypingstate();
 		print <<"/html";
@@ -116,7 +125,7 @@ sub finish {
 		close FOUT;
 		close XIN;
 
-		if ($xdotool && $composite) {
+		if ($xdotool && $composite && not $nomouse) {
 			open "MOUSEIN", "<", "mousegrabs" or warn "Couldn't open mousegrabs: mouse will not appear in screenshots\n";
 			for ($i = 0; $i < $screeni; $i++) {
 				$curmouse = <MOUSEIN>;
@@ -135,12 +144,16 @@ sub finish {
 			$xdgopen = `which xdg-open`;
 			chomp $xdgopen;
 			if ($xdgopen) {system("xdg-open \"$tmpdir\"")}
-			print STDOUT "Initial image processing complete. If you would like to edit the images before the file is saved, they are located in $tmpdir. Press return when finished.\n";
+			print STDOUT "Initial image processing complete. If you would like to edit the images before the file is saved, they are located in $tmpdir. Press return when finished.\n" if not $quiet;
 			<STDIN>
 		}
 
-		open "ASSOCFILE", "<", "tmpassoconly.html"; # this file contains only image associations, not base64
-		open "FINALFILE", ">", "tmpencoded.html"; # this file will contain base64
+		# this file contains only image associations, not base64
+		open "ASSOCFILE", "<", "tmpassoconly.html" or warn "Couldn't open image associations: The resulting file would require manual edit";
+
+		# this file will contain base64
+		open "FINALFILE", ">", "tmpencoded.html" or die "Couldn't open final output file";
+
 		select FINALFILE;
 		while (<ASSOCFILE>) {
 			$_ =~ s/<img src=\"([^\"]+)\" \/>/"<img src=\"data:$mimetype;base64," . convertToB64($1) . "\" \/>"/gie; # replace <img> tags' src attr with a base64 uri
@@ -148,11 +161,12 @@ sub finish {
 		}
 		close ASSOCFILE;
 		close FINALFILE;
+
 		chdir $originaldir;
-		copy "$tmpdir/tmpencoded.html", $outfile; # put the output in the original directory
-		remove_tree $tmpdir;
+		copy "$tmpdir/tmpencoded.html", $outfile or warn "Could not write to output: $!"; # put the output in the original directory
+		remove_tree $tmpdir or warn "Unable to remove temporary directory; junk remains in $tmpdir";
 	}
-	print STDOUT "\n";
+	print STDOUT "\n" if not $quiet;
 	exit;
 }
 
@@ -168,14 +182,16 @@ if ($countdown) {
 
 
 # From here on out the code is inspired by this answer: https://unix.stackexchange.com/a/129171, posted by Stéphane Chazelas
-open "X", "-|", "xmodmap -pke"; # open keymap
+open "X", "-|", "xmodmap -pke" or die "Couldn't open keymap."; # open keymap
 while (<X>) {
 	if (/^keycode\s+(\d+) = (\w+)(?:\s+(\w+))?/) { # keycode <number> = <normal> <shift> ...
 		$k{$1}=$2; # store normal in k, a hash
 		$K{$1}=$3 if $3; # store shift in K, a hash
 	}
 }
-open "X", "-|", "xmodmap -pm"; <X>;<X>; # open modmap
+
+# open modmap
+open "X", "-|", "xmodmap -pm" or warn "Could not open modifier map: Special keypresses would mess"; <X>;<X>;
 while (<X>) {if (/^(\w+)\s+(\w*)/){($k=$2)=~s/_[LR]$//;$m[$i++]=$k||$1}} # get a list of modifiers and stick it in an array
 close X;
 $mregex = "(shift|meta|alt|super|mod|lock|control)"; # a regex to tell whether a KeyPress is a modifier or not
@@ -212,12 +228,13 @@ sub handletypingstate { # called by non-typing events
 }
 
 sub takescreenshot {
-	system("xdotool getmouselocation >> mousegrabs &") if $xdotool && $composite;
+	system("xdotool getmouselocation >> mousegrabs &") if ($xdotool && $composite && not $nomouse);
 	system("scrot".( $focusedcap ? " --focused" : "" )." $screeni.$imgext &");
 	return $screeni++;
 }
 
-open "FOUT", ">", "tmpassoconly.html"; # open output file (NOTE: no safety here! Watch out!)
+# open output file (NOTE: no safety here! Watch out!)
+open "FOUT", ">", "tmpassoconly.html" or warn "Could not open temporary output file";
 select FOUT;
 
 # header
@@ -233,7 +250,8 @@ print <<"/html";
 		<div class="title">$outfilename_noext</div>
 /html
 
-open "XIN", "-|", "xinput --test-xi2 --root"; # execute xinput with the monitoring options
+# execute xinput with the monitoring options
+open "XIN", "-|", "xinput --test-xi2 --root" or die "Unable to watch for X input events";
 
 MAINLOOP: while (<XIN>) {
 	if (/^EVENT type.*\((.*)\)/) {$e = $1} # store event type in $e
