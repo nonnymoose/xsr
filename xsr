@@ -147,8 +147,8 @@ sub finish {
 		close FINALFILE;
 
 		chdir $originaldir;
-		copy "$tmpdir/$outfilename", $outfile; # put the output in the original directory
-		remove_tree $tmpdir;
+		copy "$tmpdir/$outfilename", $outfile or warn "Could not write to output: $!"; # put the output in the original directory
+		remove_tree $tmpdir or warn "Unable to remove temporary directory; junk remains in $tmpdir";
 	}
 	print STDOUT "\n";
 }
@@ -165,7 +165,7 @@ if ($countdown) {
 
 
 # From here on out the code is inspired by this answer: https://unix.stackexchange.com/a/129171, posted by Stéphane Chazelas
-open "X", "-|", "xmodmap -pke"; # open keymap
+open "X", "-|", "xmodmap -pke" or die "Couldn't open keymap."; # open keymap
 while (<X>) {
 	if (/^keycode\s+(\d+) = (\w+)(?:\s+(\w+))?/) { # keycode <number> = <normal> <shift> ...
 		$k{$1}=$2; # store normal in k, a hash
