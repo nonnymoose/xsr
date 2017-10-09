@@ -17,7 +17,11 @@ $focusedcap = 0;
 $countdown = 5;
 $screeni = 0; # counter for screenshot number
 $nomouse = 0;
-$helprequested = 0; # --help specified
+%mimetypes = (
+	"png", "image/png",
+	"jpg", "image/jpeg",
+	"jpeg", "image/jpeg"
+);
 
 sub usage {
 	return <<endusage;
@@ -27,7 +31,7 @@ Options:
 
   -o|--out outfile		Output file name (also can be first argument)
   -e|--edit-images-before-save	Edit images before saving file
-  -c|--image-extension ext	Extension of image output (png or jpg)
+  -c|--image-extension=ext	Extension of image output (png or jpg)
   -u|--capture-focused		Captured the focused window only
   -q|--quiet			Supress output to STDOUT
   --no-mouse			Do not add mouse to screenshots
@@ -70,9 +74,11 @@ $outfilename =~ s/^.*\///;
 $outfilename_noext = $outfilename;
 $outfilename_noext =~ s/\.[^\.]*$//;
 
-if ($imgext == "png") {$mimetype = "image/png"}
-elsif ($imgext == "jpg") {$mimetype = "image/jpeg"}
-else {print usage(); die "Invalid file type $imagext.\n"}
+if (%mimetypes{$imgext}) {$mimetype = %mimetypes{$imgext};}
+else {
+	$accepted = "";
+	die "Invalid file type $imgext.\nAccepted file types are:\n" . join(", ", keys %mimetypes) . "\n";
+}
 
 # change to a temporary directory
 $originaldir = cwd;
