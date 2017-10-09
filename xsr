@@ -12,7 +12,10 @@ $outfile = "Untitled Recording.html";
 $verbose = 0;
 $editimages = 0;
 $imgext="jpg";
+$focusedcap = 0;
+$countdown = 5;
 $screeni = 0; # counter for screenshot number
+$nomouse = 0;
 
 sub usage {
 	return <<endusage;
@@ -23,12 +26,25 @@ Options:
   -o|--out outfile		Output file name (also can be first argument)
   -e|--edit-images-before-save	Edit images before saving file
   -c|--image-extension ext	Extension of image output (png or jpg)
+  -u|--capture-focused		Captured the focused window only
+  --no-mouse			Do not add mouse to screenshots
+  --countdown[=seconds]		Display countdown (default 5)
+  --no-countdown			Don't display countdown
   -h|--help			Print this message
 
 endusage
 }
 
-GetOptions ("out|o=s" => \$outfile, "edit-images-before-save|e" => \$editimages, "image-extension|c=s" => \$imgext, "verbose|v" => \$verbose) or die "$!\n" . usage();
+GetOptions (
+	"out|o=s" => \$outfile,
+	"edit-images-before-save|e" => \$editimages,
+	"image-extension|c=s" => \$imgext,
+	"capture-focused|u" => \$focusedcap,
+	"verbose|v" => \$verbose,
+	"countdown:i" => \$countdown,
+	"no-countdown" => sub {$countdown = 0},
+	"no-mouse" => \$nomouse
+	) or die "$!\n" . usage();
 
 if (@ARGV == 1) {
 	$outfile = $ARGV[0];
@@ -40,6 +56,11 @@ else {
 	print usage();
 	die "Too many arguments.\n";
 }
+
+$outfilename = $outfile;
+$outfilename =~ s/^.*\///;
+$outfilename_noext = $outfilename;
+$outfilename_noext =~ s/\.[^\.]*$//;
 
 if ($imgext == "png") {$mimetype = "image/png"}
 elsif ($imgext == "jpg") {$mimetype = "image/jpeg"}
@@ -54,7 +75,8 @@ chdir $tmpdir or die "$! Is /tmp mounted?\n";
 # check for features, warn and do not use if false 6, 3
 $xdotool = `which xdotool`;
 chomp($xdotool);
-$xdotool or warn "xdotool unavailable: mouse cursor will not appear in screenshots\n";
+if ($nomouse) {$xdotool = "";}
+else {$xdotool or warn "xdotool unavailable: mouse cursor will not appear in screenshots\n";}
 $composite = `which composite`;
 chomp($composite);
 $composite or warn "composite unavailable: mouse cursor will not appear in screenshots\n";
@@ -62,9 +84,6 @@ $scrot = `which scrot`;
 chomp($scrot);
 $scrot or die "scrot unavailable: cannot take screenshots\n";
 
-
-$outfile_saveext = $outfile;
-$outfile_saveext =~ s/\.[^\.]*$//;
 
 sub convertToB64 {
 	if (! -e $_[0]) {
@@ -117,7 +136,7 @@ sub finish {
 		open "ASSOCFILE", "<", "tmpassoconly.html" or warn "Couldn't open image associations: The resulting file would require manual edit";
 
 		# this file will contain base64
-		open "FINALFILE", ">", $outfile or die "Couldn't open final output file";
+		open "FINALFILE", ">", $outfilename or die "Couldn't open final output file";
 
 		select FINALFILE;
 		while (<ASSOCFILE>) {
@@ -128,19 +147,21 @@ sub finish {
 		close FINALFILE;
 
 		chdir $originaldir;
-		copy "$tmpdir/$outfile", $outfile; # put the output in the original directory
+		copy "$tmpdir/$outfilename", $outfile; # put the output in the original directory
 		remove_tree $tmpdir;
 	}
 	print STDOUT "\n";
 }
 
-print "Starting in ";
-for ($i = 5; $i > 0; $i--) {
-	print $i . "\b";
-	STDOUT->flush();
-	sleep 1;
+if ($countdown) {
+	print "Starting in ";
+	for ($i = $countdown; $i > 0; $i--) {
+		print $i . "\b";
+		STDOUT->flush();
+		sleep 1;
+	}
+	print "0\nStarted. (Why are you still here?)\n";
 }
-print "0\nStarted. (Why are you still here?)\n";
 
 
 # From here on out the code is inspired by this answer: https://unix.stackexchange.com/a/129171, posted by Stéphane Chazelas
@@ -191,7 +212,7 @@ sub handletypingstate { # called by non-typing events
 
 sub takescreenshot {
 	system("xdotool getmouselocation >> mousegrabs &") if $xdotool && $composite;
-	system("scrot $screeni.$imgext &");
+	system("scrot".( $focusedcap ? " --focused" : "" )." $screeni.$imgext &");
 	return $screeni++;
 }
 
@@ -209,7 +230,7 @@ print <<"/html";
 		<style>@font-face{font-family:'Ubuntu';font-style:normal;font-weight:400;src:local('Ubuntu Regular'),local('Ubuntu-Regular'),url(https://fonts.gstatic.com/s/ubuntu/v10/sDGTilo5QRsfWu6Yc11AXg.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2212,U+2215;}body>div.title{font-family:"Ubuntu",sans-serif;font-size:2em;text-align:center;border-bottom-style:solid;border-width:thin;margin-bottom:10px;}div.instruction{margin:10px auto;padding:10px;max-width:80%;border:thin solid lightgray;border-radius:10px;display:table;}div.instruction div.title{font-family:monospace;font-size:1.2em;text-align:center;}div.footer{padding:5px;text-align:center;background-color:#f7f7f7;}img{margin-top:15px;display:block;width:100%}kbd{display:inline-block;margin:0 .1em;padding:.3em .4em;font-family:Ubuntu,Arial,"libra sans",sans-serif;font-size:75%;line-height:inherit;color:#242729;text-shadow:0 1px 0 #FFF;background-color:#e1e3e5;border:1px solid #adb3b9;border-radius:3px;box-shadow:0 1px 0 rgba(12,13,14,0.2),0 0 0 2px #FFF inset;white-space:nowrap;}</style>
 	</head>
 	<body>
-		<div class="title">$outfile_saveext</div>
+		<div class="title">$outfilename_noext</div>
 /html
 
 # execute xinput with the monitoring options
