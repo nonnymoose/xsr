@@ -15,7 +15,7 @@ Make sure you have `scrot` installed; I recommend that you have `imagemagick` an
 ```
 m4_patsubst(m4_esyscmd([[[./xsr --help | head -n -1]]]), [[[\.\/xsr]]], [[[xsr]]])m4_dnl
 ```
-To quit, press `Break` (usually on top of `Pause`). `Ctrl`+`C` works most of time fine too, although xsr will record that keypress.
+To quit, press `Break` (usually `Shift`+`Pause`). `Ctrl`+`C` works most of time fine too, although xsr will record that keypress.
 
 # Notes for this file
 __Please don't edit this file (`README.md`) directly!__
