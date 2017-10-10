@@ -27,7 +27,7 @@ Options:
   --no-countdown		Don't display countdown
   -h|--help			Print this message
 ```
-To quit, press `Break` (usually on top of `Pause`). `Ctrl`+`C` works most of time fine too, although xsr will record that keypress.
+To quit, press `Break` (usually `Shift`+`Pause`). `Ctrl`+`C` works most of time fine too, although xsr will record that keypress.
 
 # Notes for this file
 __Please don't edit this file (`README.md`) directly!__
