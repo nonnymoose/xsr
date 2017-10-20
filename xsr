@@ -22,6 +22,7 @@ $nomouse = 0;
 	"jpg", "image/jpeg",
 	"jpeg", "image/jpeg"
 );
+@mousegrabs = ();
 
 sub usage {
 	return <<endusage;
@@ -126,9 +127,8 @@ sub finish {
 		close XIN;
 
 		if ($xdotool && $composite && not $nomouse) {
-			open "MOUSEIN", "<", "mousegrabs" or warn "Couldn't open mousegrabs: mouse will not appear in screenshots\n";
-			for ($i = 0; $i < $screeni; $i++) {
-				$curmouse = <MOUSEIN>;
+			for ($i = 0; $i < @mousegrabs; $i++) {
+				$curmouse = $mousegrabs[$i];
 				chomp $curmouse;
 				if ($curmouse =~ /x:(\d+).*y:(\d+)/) {
 					$curmousex = $1 - 6; # offset of cursor in image is 6, 3
@@ -136,7 +136,6 @@ sub finish {
 				} else {last;}
 				system("composite -geometry +$curmousex+$curmousey /usr/share/xsr/Cursor.png $i.$imgext $i.$imgext") and warn "Had a problem adding the cursor to image $i\n"; # shell has reversed error codes
 			}
-			close "MOUSEIN";
 		}
 
 		# Wait here if user wants to edit the images
@@ -228,7 +227,10 @@ sub handletypingstate { # called by non-typing events
 }
 
 sub takescreenshot {
-	system("xdotool getmouselocation >> mousegrabs &") if ($xdotool && $composite && not $nomouse);
+	if ($xdotool && $composite && not $nomouse) {
+		my $curmouseloc = `xdotool getmouselocation`;
+		push(@mousegrabs, $curmouseloc);
+	}
 	system("scrot".( $focusedcap ? " --focused" : "" )." $screeni.$imgext &");
 	return $screeni++;
 }
