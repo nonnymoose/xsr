@@ -210,7 +210,8 @@ while (<$X>) {
 open $X, "-|", "xmodmap -pm" or warn "Could not open modifier map: Special keypresses would mess"; <$X>;<$X>;
 my $k;
 my @m;
-while (<$X>) {if (/^(\w+)\s+(\w*)/){my $i;($k=$2)=~s/_[LR]$//;$m[$i++]=$k||$1}} # get a list of modifiers and stick it in an array
+my $i = 0;
+while (<$X>) {if (/^(\w+)\s+(\w*)/){($k=$2)=~s/_[LR]$//;$m[$i++]=$k||$1}} # get a list of modifiers and stick it in an array
 close $X;
 my $mregex = "(shift|meta|alt|super|mod|lock|control)"; # a regex to tell whether a KeyPress is a modifier or not
 
