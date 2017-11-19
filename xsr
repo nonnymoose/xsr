@@ -278,7 +278,7 @@ open($XIN, "-|", "xinput --test-xi2 --root") or die("Unable to watch for X input
 my $e;
 my $d;
 my $movedsince;
-my $lastscroll;
+my $lastscroll = 0;
 my $buttondown;
 MAINLOOP: while (<$XIN>) {
 	if (/^EVENT type.*\((.*)\)/) {$e = $1} # store event type in $e
