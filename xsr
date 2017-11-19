@@ -53,7 +53,7 @@ GetOptions (
 	"countdown:i" => \$countdown,
 	"no-countdown" => sub {$countdown = 0},
 	"no-mouse" => \$nomouse,
-	"help|h" => sub {print usage(); exit 0;}
+	"help|h" => sub {print STDOUT usage(); exit 0;}
 	) or die "$!\n" . usage();
 
 
@@ -64,7 +64,7 @@ elsif (@ARGV == 0) {
 	#fine.
 }
 else {
-	print usage();
+	print STDOUT usage();
 	die "Too many arguments.\n";
 }
 
@@ -114,7 +114,7 @@ sub finish {
 	print STDOUT "\n" if not $quiet;
 	if (FOUT) {
 		handletypingstate();
-		print <<"/html";
+		print FOUT <<"/html";
 		<div class="footer">
 			<i>Made using <a href="https://github.com/nonnymoose/xsr">X Steps Recorder</a>.</i>
 		</div>
@@ -153,10 +153,9 @@ sub finish {
 		# this file will contain base64
 		open "FINALFILE", ">", "tmpencoded.html" or die "Couldn't open final output file";
 
-		select FINALFILE;
 		while (<ASSOCFILE>) {
 			$_ =~ s/<img src=\"([^\"]+)\" \/>/"<img src=\"data:$mimetype;base64," . convertToB64($1) . "\" \/>"/gie; # replace <img> tags' src attr with a base64 uri
-			print $_;
+			print FINALFILE $_;
 		}
 		close ASSOCFILE;
 		close FINALFILE;
@@ -170,13 +169,13 @@ sub finish {
 }
 
 if ($countdown) {
-	print "Starting in ";
+	print STDOUT "Starting in ";
 	for ($i = $countdown; $i > 0; $i--) {
-		print $i . "\b";
+		print STDOUT $i . "\b";
 		STDOUT->flush();
 		sleep 1;
 	}
-	print "0\nStarted. (Why are you still here?)\n";
+	print STDOUT "0\nStarted. (Why are you still here?)\n";
 }
 
 
@@ -221,7 +220,7 @@ sub getrealbutton { # function that makes using the above array easier
 
 sub handletypingstate { # called by non-typing events
 	if ($typing) {
-		print "</div>\n</div>\n"; # finish the output line beginning with "Type:"
+		print FOUT "</div>\n</div>\n"; # finish the output line beginning with "Type:"
 		$typing = 0; # reprint "Type:" and the like next time
 	}
 }
@@ -237,10 +236,9 @@ sub takescreenshot {
 
 # open output file (NOTE: no safety here! Watch out!)
 open "FOUT", ">", "tmpassoconly.html" or warn "Could not open temporary output file";
-select FOUT;
 
 # header
-print <<"/html";
+print FOUT <<"/html";
 <!DOCTYPE html>
 <html>
 	<head>
@@ -270,7 +268,7 @@ MAINLOOP: while (<XIN>) {
 			$movedsince = 0; # haven't moved yet since this button press
 			unless ($d == $lastscroll) { # only do printing and stuff if this is not a second or later scroll event
 				$buttondown = gettimeofday(); # store time of buttonpress
-				print "<div class=\"instruction\">\n<div class=\"title\">";
+				print FOUT "<div class=\"instruction\">\n<div class=\"title\">";
 				my @mods;
 				for (0..$#m) {
 					if (hex($m) & (1<<$_)) {
@@ -283,12 +281,12 @@ MAINLOOP: while (<XIN>) {
 					}
 				}
 				if (@mods > 0) {
-					for (0..$#mods) {print "<kbd>$mods[$_]</kbd>+"} # print modifiers if necessary
+					for (0..$#mods) {print FOUT "<kbd>$mods[$_]</kbd>+"} # print modifiers if necessary
 				}
-				print getrealbutton($d);
+				print FOUT getrealbutton($d);
 				if ($d == 4 || $d == 5) {$lastscroll = $d} # if scrolling, don't recognize any more events in the same direction until we stop scrolling
 				else {$lastscroll = 0} # we stopped scrolling because we clicked or something
-				print "</div>\n<img src=\"$shotnumber.$imgext\" />\n</div>\n";
+				print FOUT "</div>\n<img src=\"$shotnumber.$imgext\" />\n</div>\n";
 			}
 		}
 		elsif ($e =~ /^RawMotion/) {
@@ -299,7 +297,7 @@ MAINLOOP: while (<XIN>) {
 			if (gettimeofday() - $buttondown >= .075 && $movedsince) { # if we have moved the mouse since clicking and it's been more than 0.075 seconds, recognize it as a click and drag
 																																 # This is very similar to the system default
 				my $shotnumber = takescreenshot();
-				print "<div class=\"instruction\">\n<div class=\"title\">... and drag</div>\n<img src=\"$shotnumber.$imgext\" />\n</div>\n";
+				print FOUT "<div class=\"instruction\">\n<div class=\"title\">... and drag</div>\n<img src=\"$shotnumber.$imgext\" />\n</div>\n";
 			}
 		}
 	}
@@ -338,20 +336,20 @@ MAINLOOP: while (<XIN>) {
 				}
 			}
 			if ($key =~ /^break$/i) {last MAINLOOP;} # quit if the user presses Break
-			if (! $typing) {print "<div class=\"instruction\">\n<div class=\"title\">Type: "; $typing = 1} # print a type instruction if not already typing, then note that already typing from now on
+			if (! $typing) {print FOUT "<div class=\"instruction\">\n<div class=\"title\">Type: "; $typing = 1} # print a type instruction if not already typing, then note that already typing from now on
 			if (@mods > 0) {
-				for (0..$#mods) {print "<kbd>$mods[$_]</kbd>+"} # if there are modifiers in effect, print as a sequence of keys
-				print "<kbd>$key</kbd>";
+				for (0..$#mods) {print FOUT "<kbd>$mods[$_]</kbd>+"} # if there are modifiers in effect, print as a sequence of keys
+				print FOUT "<kbd>$key</kbd>";
 			}
 			elsif (length($key) == 1) {
-				print $key; # if the realchar of a key is a single character, don't style it as a key
+				print FOUT $key; # if the realchar of a key is a single character, don't style it as a key
 			}
 			else {
-				print "<kbd>$key</kbd>"; # else style it as a key
+				print FOUT "<kbd>$key</kbd>"; # else style it as a key
 			}
 			if ($k{$d} =~ /Return|Enter/i) {
 				my $shotnumber = takescreenshot();
-				print "</div>\n<img src=\"$shotnumber.$imgext\" />\n</div>\n"; # finish the output line beginning with "Type:"
+				print FOUT "</div>\n<img src=\"$shotnumber.$imgext\" />\n</div>\n"; # finish the output line beginning with "Type:"
 				$typing = 0; # reprint "Type:" and the like next time
 			} # if the user presses return, then end the type instruction and add a screenshot
 	  }
