@@ -5,6 +5,7 @@ use sigtrap qw/handler finish normal-signals/;
 use Cwd qw(cwd);
 use File::Copy qw(copy);
 use File::Path qw(remove_tree);
+use MIME::Base64 qw(encode_base64); # internal Base64 (see #41)
 # use strict; # sigh FIXME
 use Getopt::Long;
 
@@ -107,7 +108,14 @@ sub convertToB64 {
 		warn "Cannot convert $_[0]: no such file or directory\n";
 		return $_[0];
 	}
-	return `base64 -w 0 $_[0]`; # -w 0 : do not wrap
+	# return `base64 -w 0 $_[0]`; # -w 0 : do not wrap  # should use internal base64
+	open INIMG, "<", $_[0] or (warn "Cannot open $_[0], this image will be broken!" and return "");
+	{ # Slurp mode. If we don't have enough ram, I don't know how it ran in the first place!
+		local $/;
+		my $imgcontent = <INIMG>;
+		close INIMG;
+		return encode_base64($imgcontent);
+	}
 }
 
 sub finish {
