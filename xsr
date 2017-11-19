@@ -6,24 +6,27 @@ use Cwd qw(cwd);
 use File::Copy qw(copy);
 use File::Path qw(remove_tree);
 use MIME::Base64 qw(encode_base64); # internal Base64 (see #41)
-# use strict; # sigh FIXME
+use strict;
+use warnings;
 use Getopt::Long;
 
-$outfile = "Untitled Recording.html";
-$verbose = 0;
-$quiet = 0;
-$editimages = 0;
-$imgext="jpg";
-$focusedcap = 0;
-$countdown = 5;
-$screeni = 0; # counter for screenshot number
-$nomouse = 0;
-%mimetypes = (
+my $outfile = "Untitled Recording.html";
+my $FOUT; # output filehandle
+my $XIN;
+my $verbose = 0;
+my $quiet = 0;
+my $editimages = 0;
+my $imgext="jpg";
+my $focusedcap = 0;
+my $countdown = 5;
+my $screeni = 0; # counter for screenshot number
+my $nomouse = 0;
+my %mimetypes = (
 	"png", "image/png",
 	"jpg", "image/jpeg",
 	"jpeg", "image/jpeg"
 );
-@mousegrabs = ();
+my @mousegrabs = ();
 
 sub usage {
 	return <<endusage;
@@ -71,25 +74,28 @@ else {
 
 if ($quiet) {$countdown = 0;}
 
-$outfilename = $outfile;
+my $outfilename = $outfile;
 $outfilename =~ s/^.*\///;
-$outfilename_noext = $outfilename;
+my $outfilename_noext = $outfilename;
 $outfilename_noext =~ s/\.[^\.]*$//;
 
-if (%mimetypes{$imgext}) {$mimetype = %mimetypes{$imgext};}
+my $mimetype;
+if ($mimetypes{$imgext}) {$mimetype = $mimetypes{$imgext};}
 else {
-	$accepted = "";
+	# $accepted = ""; what was that for again? :)
 	die "Invalid file type $imgext.\nAccepted file types are:\n" . join(", ", keys %mimetypes) . "\n";
 }
 
 # change to a temporary directory
-$originaldir = cwd;
-$tmpdir = `mktemp -d`;
+my $originaldir = cwd;
+my $tmpdir = `mktemp -d`;
 chomp	$tmpdir; # mktemp returns a newline
 chdir $tmpdir or die "$! Is /tmp mounted?\n";
 
 # check for features, warn and do not use if unavailable
 # only check if mouse will be used for first two
+my $xdotool;
+my $composite;
 if (not $nomouse) {
 	$xdotool = `which xdotool`;
 	chomp($xdotool);
@@ -98,7 +104,7 @@ if (not $nomouse) {
 	chomp($composite);
 	$composite or warn "composite unavailable: mouse cursor will not appear in screenshots\n";
 }
-$scrot = `which scrot`;
+my $scrot = `which scrot`;
 chomp($scrot);
 $scrot or die "scrot unavailable: cannot take screenshots\n";
 
@@ -109,20 +115,20 @@ sub convertToB64 {
 		return $_[0];
 	}
 	# return `base64 -w 0 $_[0]`; # -w 0 : do not wrap  # should use internal base64
-	open INIMG, "<", $_[0] or (warn "Cannot open $_[0], this image will be broken!" and return "");
+	open my $INIMG, "<", $_[0] or (warn "Cannot open $_[0], this image will be broken!" and return "");
 	{ # Slurp mode. If we don't have enough ram, I don't know how it ran in the first place!
 		local $/;
-		my $imgcontent = <INIMG>;
-		close INIMG;
+		my $imgcontent = <$INIMG>;
+		close $INIMG;
 		return encode_base64($imgcontent);
 	}
 }
 
 sub finish {
 	print STDOUT "\n" if not $quiet;
-	if (FOUT) {
+	if ($FOUT) {
 		handletypingstate();
-		print FOUT <<"/html";
+		print $FOUT <<"/html";
 		<div class="footer">
 			<i>Made using <a href="https://github.com/nonnymoose/xsr">X Steps Recorder</a>.</i>
 		</div>
@@ -130,14 +136,16 @@ sub finish {
 </html>
 /html
 
-		FOUT->flush();
-		close FOUT;
-		close XIN;
+		$FOUT->flush();
+		close $FOUT;
+		close $XIN;
 
 		if ($xdotool && $composite && not $nomouse) {
-			for ($i = 0; $i < @mousegrabs; $i++) {
-				$curmouse = $mousegrabs[$i];
+			for (my $i = 0; $i < @mousegrabs; $i++) {
+				my $curmouse = $mousegrabs[$i];
 				chomp $curmouse;
+				my $curmousex;
+				my $curmousey;
 				if ($curmouse =~ /x:(\d+).*y:(\d+)/) {
 					$curmousex = $1 - 6; # offset of cursor in image is 6, 3
 					$curmousey = $2 - 3;
@@ -148,7 +156,7 @@ sub finish {
 
 		# Wait here if user wants to edit the images
 		if ($editimages) {
-			$xdgopen = `which xdg-open`;
+			my $xdgopen = `which xdg-open`;
 			chomp $xdgopen;
 			if ($xdgopen) {system("xdg-open \"$tmpdir\"")}
 			print STDOUT "Initial image processing complete. If you would like to edit the images before the file is saved, they are located in $tmpdir. Press return when finished.\n" if not $quiet;
@@ -156,17 +164,17 @@ sub finish {
 		}
 
 		# this file contains only image associations, not base64
-		open "ASSOCFILE", "<", "tmpassoconly.html" or warn "Couldn't open image associations: The resulting file would require manual edit";
+		open my $ASSOCFILE, "<", "tmpassoconly.html" or warn "Couldn't open image associations: The resulting file would require manual edit";
 
 		# this file will contain base64
-		open "FINALFILE", ">", "tmpencoded.html" or die "Couldn't open final output file";
+		open my $FINALFILE, ">", "tmpencoded.html" or die "Couldn't open final output file";
 
-		while (<ASSOCFILE>) {
+		while (<$ASSOCFILE>) {
 			$_ =~ s/<img src=\"([^\"]+)\" \/>/"<img src=\"data:$mimetype;base64," . convertToB64($1) . "\" \/>"/gie; # replace <img> tags' src attr with a base64 uri
-			print FINALFILE $_;
+			print $FINALFILE $_;
 		}
-		close ASSOCFILE;
-		close FINALFILE;
+		close $ASSOCFILE;
+		close $FINALFILE;
 
 		chdir $originaldir;
 		copy "$tmpdir/tmpencoded.html", $outfile or warn "Could not write to output: $!"; # put the output in the original directory
@@ -178,7 +186,7 @@ sub finish {
 
 if ($countdown) {
 	print STDOUT "Starting in ";
-	for ($i = $countdown; $i > 0; $i--) {
+	for (my $i = $countdown; $i > 0; $i--) {
 		print STDOUT $i . "\b";
 		STDOUT->flush();
 		sleep 1;
@@ -188,8 +196,10 @@ if ($countdown) {
 
 
 # From here on out the code is inspired by this answer: https://unix.stackexchange.com/a/129171, posted by Stéphane Chazelas
-open "X", "-|", "xmodmap -pke" or die "Couldn't open keymap."; # open keymap
-while (<X>) {
+open my $X, "-|", "xmodmap -pke" or die "Couldn't open keymap."; # open keymap
+my %k;
+my %K;
+while (<$X>) {
 	if (/^keycode\s+(\d+) = (\w+)(?:\s+(\w+))?/) { # keycode <number> = <normal> <shift> ...
 		$k{$1}=$2; # store normal in k, a hash
 		$K{$1}=$3 if $3; # store shift in K, a hash
@@ -197,17 +207,20 @@ while (<X>) {
 }
 
 # open modmap
-open "X", "-|", "xmodmap -pm" or warn "Could not open modifier map: Special keypresses would mess"; <X>;<X>;
-while (<X>) {if (/^(\w+)\s+(\w*)/){($k=$2)=~s/_[LR]$//;$m[$i++]=$k||$1}} # get a list of modifiers and stick it in an array
-close X;
-$mregex = "(shift|meta|alt|super|mod|lock|control)"; # a regex to tell whether a KeyPress is a modifier or not
+open $X, "-|", "xmodmap -pm" or warn "Could not open modifier map: Special keypresses would mess"; <$X>;<$X>;
+my $k;
+my @m;
+while (<$X>) {if (/^(\w+)\s+(\w*)/){my $i;($k=$2)=~s/_[LR]$//;$m[$i++]=$k||$1}} # get a list of modifiers and stick it in an array
+close $X;
+my $mregex = "(shift|meta|alt|super|mod|lock|control)"; # a regex to tell whether a KeyPress is a modifier or not
 
-%realchars = ("exclam","!","at","@","numbersign","#","dollar","\$","percent","%","asciicircum","^","ampersand","&","asterisk","*","parenleft","(","parenright",")","minus","-","underscore","_","equal","=","plus","+","bracketleft","[","braceleft","{","bracketright","]","braceright","}","semicolon",";","colon",":","apostrophe","'","quotedbl","\"","grave","`","asciitilde","~","backslash","\\","bar","|","comma",",","less","<","period",".","greater",">","slash","/","question","?","Multiply","*","space"," ","Subtract","-","Left"," ← ","Right"," → ","Add","+","Down"," ↓ ","less","<","greater",">","Divide","/","Print","PrintScreen","Up"," ↑ ","Prior","PageUp","Next","PageDown","Equal","=","plusminus","±","Decimal",".");
+my $typing = 0; #boolean tracking whether the user is typing
+my %realchars = ("exclam","!","at","@","numbersign","#","dollar","\$","percent","%","asciicircum","^","ampersand","&","asterisk","*","parenleft","(","parenright",")","minus","-","underscore","_","equal","=","plus","+","bracketleft","[","braceleft","{","bracketright","]","braceright","}","semicolon",";","colon",":","apostrophe","'","quotedbl","\"","grave","`","asciitilde","~","backslash","\\","bar","|","comma",",","less","<","period",".","greater",">","slash","/","question","?","Multiply","*","space"," ","Subtract","-","Left"," ← ","Right"," → ","Add","+","Down"," ↓ ","less","<","greater",">","Divide","/","Print","PrintScreen","Up"," ↑ ","Prior","PageUp","Next","PageDown","Equal","=","plusminus","±","Decimal",".");
 # ↑: a hash with human-readable names associated with the machine-readable key names returned by xinput
-@realbuttons = (undef, "Left-click", "Middle-click", "Right-click", "Scroll Up", "Scroll Down"); # an array of mouse button names (note that button IDs are 1-indexed)
+my @realbuttons = (undef, "Left-click", "Middle-click", "Right-click", "Scroll Up", "Scroll Down"); # an array of mouse button names (note that button IDs are 1-indexed)
 
 sub getrealchar { # function that makes using the above hash easier
-	$keycode = $_[0];
+	my $keycode = $_[0];
 	$keycode =~ s/KP_//i; # remove any number pad designation
 	if ($realchars{$keycode}) {
 		return $realchars{$keycode}; # make sure to only return the value if it's in the array (many aren't because the machine-readable name is also human-readable)
@@ -228,7 +241,7 @@ sub getrealbutton { # function that makes using the above array easier
 
 sub handletypingstate { # called by non-typing events
 	if ($typing) {
-		print FOUT "</div>\n</div>\n"; # finish the output line beginning with "Type:"
+		print $FOUT "</div>\n</div>\n"; # finish the output line beginning with "Type:"
 		$typing = 0; # reprint "Type:" and the like next time
 	}
 }
@@ -243,10 +256,10 @@ sub takescreenshot {
 }
 
 # open output file (NOTE: no safety here! Watch out!)
-open "FOUT", ">", "tmpassoconly.html" or warn "Could not open temporary output file";
+open $FOUT, ">", "tmpassoconly.html" or warn "Could not open temporary output file";
 
 # header
-print FOUT <<"/html";
+print $FOUT <<"/html";
 <!DOCTYPE html>
 <html>
 	<head>
@@ -259,9 +272,14 @@ print FOUT <<"/html";
 /html
 
 # execute xinput with the monitoring options
-open "XIN", "-|", "xinput --test-xi2 --root" or die "Unable to watch for X input events";
+open $XIN, "-|", "xinput --test-xi2 --root" or die "Unable to watch for X input events";
 
-MAINLOOP: while (<XIN>) {
+my $e;
+my $d;
+my $movedsince;
+my $lastscroll;
+my $buttondown;
+MAINLOOP: while (<$XIN>) {
 	if (/^EVENT type.*\((.*)\)/) {$e = $1} # store event type in $e
 	elsif (/detail: (\d+)/) {$d=$1} # store event detail in $d
 	elsif (/flags: /) { # process Raw mouse events (for some reason, maximized windows don't return standard motion events)
@@ -276,8 +294,9 @@ MAINLOOP: while (<XIN>) {
 			$movedsince = 0; # haven't moved yet since this button press
 			unless ($d == $lastscroll) { # only do printing and stuff if this is not a second or later scroll event
 				$buttondown = gettimeofday(); # store time of buttonpress
-				print FOUT "<div class=\"instruction\">\n<div class=\"title\">";
+				print $FOUT "<div class=\"instruction\">\n<div class=\"title\">";
 				my @mods;
+				my $m = 0;
 				for (0..$#m) {
 					if (hex($m) & (1<<$_)) {
 						if ($m[$_] =~ /num.*lock/i) {
@@ -289,12 +308,12 @@ MAINLOOP: while (<XIN>) {
 					}
 				}
 				if (@mods > 0) {
-					for (0..$#mods) {print FOUT "<kbd>$mods[$_]</kbd>+"} # print modifiers if necessary
+					for (0..$#mods) {print $FOUT "<kbd>$mods[$_]</kbd>+"} # print modifiers if necessary
 				}
-				print FOUT getrealbutton($d);
+				print $FOUT getrealbutton($d);
 				if ($d == 4 || $d == 5) {$lastscroll = $d} # if scrolling, don't recognize any more events in the same direction until we stop scrolling
 				else {$lastscroll = 0} # we stopped scrolling because we clicked or something
-				print FOUT "</div>\n<img src=\"$shotnumber.$imgext\" />\n</div>\n";
+				print $FOUT "</div>\n<img src=\"$shotnumber.$imgext\" />\n</div>\n";
 			}
 		}
 		elsif ($e =~ /^RawMotion/) {
@@ -305,15 +324,15 @@ MAINLOOP: while (<XIN>) {
 			if (gettimeofday() - $buttondown >= .075 && $movedsince) { # if we have moved the mouse since clicking and it's been more than 0.075 seconds, recognize it as a click and drag
 																																 # This is very similar to the system default
 				my $shotnumber = takescreenshot();
-				print FOUT "<div class=\"instruction\">\n<div class=\"title\">... and drag</div>\n<img src=\"$shotnumber.$imgext\" />\n</div>\n";
+				print $FOUT "<div class=\"instruction\">\n<div class=\"title\">... and drag</div>\n<img src=\"$shotnumber.$imgext\" />\n</div>\n";
 			}
 		}
 	}
 	elsif (/modifiers:.*effective: (.*)/) { # do the real work now that we have all of the information
-	  $m=$1; # store modifier counter in $m
+		my $m=$1; # store modifier counter in $m
 		if ($e =~ /^KeyPress/){ # handle typing
 			$lastscroll = 0; # definitely not scrolling anymore
-			$key = getrealchar($k{$d}); # get machine-readable name from detail, then get human-readable name from that
+			my $key = getrealchar($k{$d}); # get machine-readable name from detail, then get human-readable name from that
 			if ($key =~ /$mregex/i) { # skip this iteration if the key is a modifier
 				next;
 			}
@@ -344,20 +363,20 @@ MAINLOOP: while (<XIN>) {
 				}
 			}
 			if ($key =~ /^break$/i) {last MAINLOOP;} # quit if the user presses Break
-			if (! $typing) {print FOUT "<div class=\"instruction\">\n<div class=\"title\">Type: "; $typing = 1} # print a type instruction if not already typing, then note that already typing from now on
+			if (! $typing) {print $FOUT "<div class=\"instruction\">\n<div class=\"title\">Type: "; $typing = 1} # print a type instruction if not already typing, then note that already typing from now on
 			if (@mods > 0) {
-				for (0..$#mods) {print FOUT "<kbd>$mods[$_]</kbd>+"} # if there are modifiers in effect, print as a sequence of keys
-				print FOUT "<kbd>$key</kbd>";
+				for (0..$#mods) {print $FOUT "<kbd>$mods[$_]</kbd>+"} # if there are modifiers in effect, print as a sequence of keys
+				print $FOUT "<kbd>$key</kbd>";
 			}
 			elsif (length($key) == 1) {
-				print FOUT $key; # if the realchar of a key is a single character, don't style it as a key
+				print $FOUT $key; # if the realchar of a key is a single character, don't style it as a key
 			}
 			else {
-				print FOUT "<kbd>$key</kbd>"; # else style it as a key
+				print $FOUT "<kbd>$key</kbd>"; # else style it as a key
 			}
 			if ($k{$d} =~ /Return|Enter/i) {
 				my $shotnumber = takescreenshot();
-				print FOUT "</div>\n<img src=\"$shotnumber.$imgext\" />\n</div>\n"; # finish the output line beginning with "Type:"
+				print $FOUT "</div>\n<img src=\"$shotnumber.$imgext\" />\n</div>\n"; # finish the output line beginning with "Type:"
 				$typing = 0; # reprint "Type:" and the like next time
 			} # if the user presses return, then end the type instruction and add a screenshot
 	  }
