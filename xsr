@@ -16,6 +16,7 @@ my $XIN;
 my $verbose = 0;
 my $quiet = 0;
 my $editimages = 0;
+my $imagedeps = 0;
 my $imgext="jpg";
 my $focusedcap = 0;
 my $countdown = 5;
@@ -36,6 +37,7 @@ Options:
 
   -o|--out outfile		Output file name (also can be first argument)
   -e|--edit-images-before-save	Edit images before saving file
+  -d|--image-deps		Do not convert images to base64; instead, output the dependent file and it's resources directory
   -c|--image-extension=ext	Extension of image output (png or jpg)
   -u|--capture-focused		Captured the focused window only
   -q|--quiet			Supress output to STDOUT
@@ -50,6 +52,7 @@ endusage
 GetOptions (
 	"out|o=s" => \$outfile,
 	"edit-images-before-save|e" => \$editimages,
+	"image-deps|d" => \$imagedeps,
 	"image-extension|c=s" => \$imgext,
 	"capture-focused|u" => \$focusedcap,
 	"verbose|v" => \$verbose,
@@ -165,17 +168,31 @@ sub finish {
 		# this file contains only image associations, not base64
 		open(my $ASSOCFILE, "<", "tmpassoconly.html") or warn("Couldn't open image associations: The resulting file would require manual edit");
 
-		# this file will contain base64
+		# this file will either be base64-encoded or associated with the final output *directory*
 		open(my $FINALFILE, ">", "tmpencoded.html") or die("Couldn't open final output file");
 
-		while (<$ASSOCFILE>) {
-			$_ =~ s/<img src=\"([^\"]+)\" \/>/"<img src=\"data:$mimetype;base64," . convertToB64($1) . "\" \/>"/gie; # replace <img> tags' src attr with a base64 uri
-			print($FINALFILE $_);
+		if ($imagedeps) {
+			while (<$ASSOCFILE>) {
+				$_ =~ s/<img src=\"([^\"]+)\" \/>/<img src=\"$outfilename_noext\/$1\" \/>/gi; # replace <img> tags' src attr with relative path to images
+				print($FINALFILE $_);
+			}
+		}
+		else {
+			while (<$ASSOCFILE>) {
+				$_ =~ s/<img src=\"([^\"]+)\" \/>/"<img src=\"data:$mimetype;base64," . convertToB64($1) . "\" \/>"/gie; # replace <img> tags' src attr with a base64 uri
+				print($FINALFILE $_);
+			}
 		}
 		close($ASSOCFILE);
 		close($FINALFILE);
 
 		chdir($originaldir);
+		if ($imagedeps) {
+			mkdir($outfilename_noext);
+			for (my $i = 0; $i < $screeni; $i++) {
+				copy "$tmpdir/$i.$imgext", "$outfilename_noext/$i.$imgext" or warn("Could not copy image #$i.");
+			} # copy all image files to the dependent directory
+		}
 		copy "$tmpdir/tmpencoded.html", $outfile or warn("Could not write to output: $!"); # put the output in the original directory
 		remove_tree $tmpdir or warn("Unable to remove temporary directory; junk remains in $tmpdir");
 	}
