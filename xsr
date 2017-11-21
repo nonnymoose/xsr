@@ -82,7 +82,6 @@ $outfilename_noext =~ s/\.[^\.]*$//;
 my $mimetype;
 if ($mimetypes{$imgext}) {$mimetype = $mimetypes{$imgext};}
 else {
-	# $accepted = ""; what was that for again? :)
 	die("Invalid file type $imgext.\nAccepted file types are:\n" . join(", ", keys %mimetypes) . "\n");
 }
 
@@ -144,13 +143,13 @@ sub finish {
 			for (my $i = 0; $i < @mousegrabs; $i++) {
 				my $curmouse = $mousegrabs[$i];
 				chomp($curmouse);
-				my $curmousex;
-				my $curmousey;
 				if ($curmouse =~ /x:(\d+).*y:(\d+)/) {
+					my $curmousex;
+					my $curmousey;
 					$curmousex = $1 - 6; # offset of cursor in image is 6, 3
 					$curmousey = $2 - 3;
-				} else {last;}
-				system("composite -geometry +$curmousex+$curmousey /usr/share/xsr/Cursor.png $i.$imgext $i.$imgext") and warn("Had a problem adding the cursor to image $i\n"); # shell has reversed error codes
+					system("composite -geometry +$curmousex+$curmousey /usr/share/xsr/Cursor.png $i.$imgext $i.$imgext") and warn("Had a problem adding the cursor to image $i\n"); # shell has reversed error codes
+				}
 			}
 		}
 
@@ -197,12 +196,12 @@ if ($countdown) {
 
 # From here on out the code is inspired by this answer: https://unix.stackexchange.com/a/129171, posted by Stéphane Chazelas
 open(my $X, "-|", "xmodmap -pke") or die("Couldn't open keymap."); # open keymap
-my %k;
-my %K;
+my %k; # store normal in k, a hash
+my %K; # store shift in K, a hash
 while (<$X>) {
 	if (/^keycode\s+(\d+) = (\w+)(?:\s+(\w+))?/) { # keycode <number> = <normal> <shift> ...
-		$k{$1}=$2; # store normal in k, a hash
-		$K{$1}=$3 if $3; # store shift in K, a hash
+		$k{$1}=$2;
+		$K{$1}=$3 if $3;
 	}
 }
 
