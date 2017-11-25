@@ -19,6 +19,7 @@ Options:
 
   -o|--out outfile		Output file name (also can be first argument)
   -e|--edit-images-before-save	Edit images before saving file
+  -d|--image-deps		Do not convert images to base64; instead, output the dependent file and it's resources directory
   -c|--image-extension=ext	Extension of image output (png or jpg)
   -u|--capture-focused		Captured the focused window only
   -q|--quiet			Supress output to STDOUT
