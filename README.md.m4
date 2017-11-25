@@ -13,7 +13,7 @@ Make sure you have `scrot` installed; I recommend that you have `imagemagick` an
 # Usage
 
 ```
-m4_syscmd([[[./xsr --help | head -n -1 | sed -s 's#\./xsr#xsr#g']]])m4_dnl
+m4_syscmd([[[./xsr --help | head -n -1 | sed -s 's#\(^Usage:\)\(\s*\)\./\(xsr\)#\1\2\3#']]])m4_dnl
 ```
 To quit, press `Break` (usually `Shift`+`Pause`). `Ctrl`+`C` works most of time fine too, although xsr will record that keypress.
 
