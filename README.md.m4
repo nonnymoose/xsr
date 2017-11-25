@@ -13,7 +13,7 @@ Make sure you have `scrot` installed; I recommend that you have `imagemagick` an
 # Usage
 
 ```
-m4_patsubst(m4_esyscmd([[[./xsr --help | head -n -1]]]), [[[\.\/xsr]]], [[[xsr]]])m4_dnl
+m4_syscmd([[[./xsr --help | head -n -1]]])m4_dnl
 ```
 To quit, press `Break` (usually `Shift`+`Pause`). `Ctrl`+`C` works most of time fine too, although xsr will record that keypress.
 

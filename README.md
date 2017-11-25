@@ -13,7 +13,7 @@ Make sure you have `scrot` installed; I recommend that you have `imagemagick` an
 # Usage
 
 ```
-Usage: xsr [options] [outfile]
+Usage: ./xsr [options] [outfile]
 
 Options:
 
