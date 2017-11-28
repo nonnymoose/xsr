@@ -8,7 +8,7 @@ jobs:
                   before_install:
                           - git config user.name TravisCI
                           - git config user.email https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID
-                  script: >
+                  script: |
                           set -e
                           make -B maint
                           if git diff-index --quiet HEAD --; then
