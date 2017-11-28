@@ -1,5 +1,5 @@
 .PHONY: all
-all: test README.md xsr
+all: test maint xsr
 
 .PHONY: test
 test:
