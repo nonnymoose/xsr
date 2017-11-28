@@ -9,9 +9,12 @@ jobs:
                           - git config user.name TravisCI
                           - git config user.email https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID
                   script: >
-                          make -B maint &&
-                          git diff-index --quiet HEAD -- && (
-                                  git add . &&
-                                  git commit -m "Generate maintainer files" &&
-                                  git push https://$github_token@github.com/$TRAVIS_REPO_SLUG HEAD:$TRAVIS_BRANCH
-                          ) || echo "Nothing changed"
+                          set -e
+                          make -B maint
+                          if git diff-index --quiet HEAD --; then
+                                git add . &&
+                                git commit -m "Generate maintainer files" &&
+                                git push https://$github_token@github.com/$TRAVIS_REPO_SLUG HEAD:$TRAVIS_BRANCH
+                          else
+                                echo "Nothing changed"
+                          fi
