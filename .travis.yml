@@ -10,6 +10,7 @@ jobs:
                           - git config user.email https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID
                   script: |
                           set -ex
+                          git checkout $TRAVIS_BRANCH
                           make -B maint
                           if ! git diff-index --quiet HEAD --; then
                                 git status
