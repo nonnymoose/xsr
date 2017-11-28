@@ -1,2 +1,6 @@
 language: perl
 install: true
+
+jobs:
+        include:
+                - script: make test
