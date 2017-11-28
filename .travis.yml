@@ -4,3 +4,12 @@ install: true
 jobs:
         include:
                 - script: make test
+                - stage: maintain
+                  before_install:
+                          - git config user.name TravisCI
+                          - git config user.email https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID
+                  script:
+                          - make -B maint
+                          - git add .
+                          - git commit -m "Generate maintainer files"
+                          - git push https://$github_token@github.com/$TRAVIS_REPO_SLUG HEAD:$TRAVIS_BRANCH
