@@ -13,3 +13,7 @@ jobs:
                           - git add .
                           - git commit -m "Generate maintainer files"
                           - git push https://$github_token@github.com/$TRAVIS_REPO_SLUG HEAD:$TRAVIS_BRANCH
+
+matrix:
+        allow_failures:
+                - stage: maintain
