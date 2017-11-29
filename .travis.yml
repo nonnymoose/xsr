@@ -8,16 +8,16 @@ jobs:
                   before_install:
                           - git config user.name TravisCI
                           - git config user.email https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID
-                  script: |
-                          set -ex
-                          git checkout $TRAVIS_BRANCH
-                          make -B maint
-                          if ! git diff-index --quiet HEAD --; then
-                                git status
-                                git diff-index HEAD
-                                git add .
-                                git commit -m "Generate maintainer files"
+                  script:
+                          - git checkout $TRAVIS_BRANCH
+                          - make -B maint
+                          - git status
+                          - [ -z "`git ls-files -dok`" ] || { echo "Untracked files present: Please commit this generation manually"; false }
+                          - |
+                            set -ex
+                            if [ -n "`git ls-files -m`" ]; then
+                                git commit -am "Generate maintainer files"
                                 git push https://$github_token@github.com/$TRAVIS_REPO_SLUG HEAD:$TRAVIS_BRANCH
-                          else
+                            else
                                 echo "Nothing changed"
-                          fi
+                            fi
