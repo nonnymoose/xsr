@@ -14,6 +14,7 @@ jobs:
                           make -B maint
                           if ! git diff-index --quiet HEAD --; then
                                 git status
+                                git diff-index HEAD
                                 git add .
                                 git commit -m "Generate maintainer files"
                                 git push https://$github_token@github.com/$TRAVIS_REPO_SLUG HEAD:$TRAVIS_BRANCH
