@@ -12,11 +12,11 @@ jobs:
                           - git checkout $TRAVIS_BRANCH
                           - make -B maint
                           - git status
-                          - \[ -z "`git ls-files -dok`" \] \|| \{ echo "Untracked files present: Please commit this generation manually"; false \}
+                          - test -z "`git ls-files -dok`" ] || { echo "Untracked files present: Please commit this generation manually"; false }
                           - |
                             (
                                     set -e
-                                    if \[ -n "`git ls-files -m`" \]; then
+                                    if [ -n "`git ls-files -m`" ]; then
                                             git commit -am "Generate maintainer files"
                                             git push https://$github_token@github.com/$TRAVIS_REPO_SLUG HEAD:$TRAVIS_BRANCH
                                     else
