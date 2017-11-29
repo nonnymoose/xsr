@@ -12,7 +12,7 @@ jobs:
                           - git checkout $TRAVIS_BRANCH
                           - make -B maint
                           - git status
-                          - [ -z "`git ls-files -dok`" ] || { echo "Untracked files present: Please commit this generation manually"; false }
+                          - [ -z "`git ls-files -dok`" ] \|| { echo "Untracked files present: Please commit this generation manually"; false }
                           - |
                             set -ex
                             if [ -n "`git ls-files -m`" ]; then
