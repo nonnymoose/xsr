@@ -1,0 +1,25 @@
+language: perl
+install: true
+
+jobs:
+        include:
+                - script: make test
+                - stage: maintain
+                  before_install:
+                          - git config user.name TravisCI
+                          - git config user.email https://travis-ci.org/$TRAVIS_REPO_SLUG/builds/$TRAVIS_BUILD_ID
+                  script:
+                          - git checkout $TRAVIS_BRANCH
+                          - make -B maint
+                          - git status
+                          - test -z "`git ls-files -dok`" || { echo "Untracked files present, please commit this generation manually!"; false; }
+                          - |
+                            (
+                                    set -e
+                                    if [ -n "`git ls-files -m`" ]; then
+                                            git commit -am "Generate maintainer files"
+                                            git push https://$github_token@github.com/$TRAVIS_REPO_SLUG HEAD:$TRAVIS_BRANCH
+                                    else
+                                            echo "Nothing changed"
+                                    fi
+                            )
