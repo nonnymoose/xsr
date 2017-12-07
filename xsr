@@ -6,9 +6,14 @@ use Cwd qw(cwd);
 use File::Copy qw(copy);
 use File::Path qw(remove_tree);
 use MIME::Base64 qw(encode_base64); # internal Base64 (see #41)
+use POSIX qw(setlocale LC_ALL);
 use strict;
 use warnings;
 use Getopt::Long;
+
+# get the current locale (minus the character encoding)
+my $locale = setlocale(LC_ALL); # ex. en_US.UTF-8
+$locale =~ s/\..*$//; # ex. en_US
 
 my $outfile = "Untitled Recording.html";
 my $FOUT; # output filehandle
