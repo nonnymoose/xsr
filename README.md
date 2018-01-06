@@ -23,6 +23,7 @@ Options:
   -c|--image-extension=ext	Extension of image output (png or jpg)
   -u|--capture-focused		Captured the focused window only
   -q|--quiet			Supress output to STDOUT
+  --mouse-icon|--cursor=file	Specify cursor image (default: the one installed to /usr/share/xsr/Cursor.png)
   --no-mouse			Do not add mouse to screenshots
   --countdown[=seconds]		Display countdown (default 5)
   --no-countdown		Don't display countdown
