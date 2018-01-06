@@ -16,7 +16,7 @@ README.md: xsr README.md.m4 markdown-preset.m4
 		README.md.m4 > README.md
 
 po/template.pot: xsr
-	xgettext -L perl xsr --from-code=utf-8 `cat gettext_options` --output=po/template.pot
+	xgettext -L perl xsr --from-code=utf-8 --omit-header `cat gettext_options` --output=po/template.pot
 
 po/%.mo: po/%.po
 	msgfmt --check --statistics $< -o $@
