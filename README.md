@@ -17,7 +17,7 @@ Usage: xsr [options] [outfile]
 
 Options:
 
-  -u|--capture-focused         Captured the focused window only
+  -u|--capture-focused         Capture the focused window only
   -e|--edit-images-before-save Edit images before saving file
   --no-mouse                   Do not add mouse to screenshots
   -d|--image-deps              Do not convert images to base64; instead, output the dependent file and it's resources directory
