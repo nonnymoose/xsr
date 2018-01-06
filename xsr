@@ -52,7 +52,7 @@ sub usage {
 		"--no-countdown"		=> __"Don't display countdown",
 		"-h|--help"			=> __"Print this message",
 	);
-	my $maxoptlen = 0; $maxoptlen = max(map length, keys %options);
+	my $maxoptlen = 0; $maxoptlen = max(map length, sort keys %options);
 
 	my $usage_str = __x("Usage: {xsr} [options] [outfile]\n", xsr=>$0);
 
