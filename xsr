@@ -87,7 +87,7 @@ elsif (@ARGV == 0) {
 }
 else {
 	print(STDOUT usage());
-	die("Too many arguments.\n");
+	die(__"Too many arguments.\n");
 }
 
 if ($quiet) {$countdown = 0;}
@@ -100,14 +100,17 @@ $outfilename_noext =~ s/\.[^\.]*$//;
 my $mimetype;
 if ($mimetypes{$imgext}) {$mimetype = $mimetypes{$imgext};}
 else {
-	die("Invalid file type $imgext.\nAccepted file types are:\n" . join(", ", keys %mimetypes) . "\n");
+	die(__x("Invalid file type {imgext}.\nAccepted file types are:\n{targettypes}",
+			imgext => $imgext,
+			targettypes => join(", ", keys %mimetypes) . "\n")
+	);
 }
 
 # change to a temporary directory
 my $originaldir = cwd;
 my $tmpdir = `mktemp -d`;
 chomp($tmpdir); # mktemp returns a newline
-chdir($tmpdir) or die("$! Is /tmp mounted?\n");
+chdir($tmpdir) or die($!.__" Is /tmp mounted?\n");
 
 # check for features, warn and do not use if unavailable
 # only check if mouse will be used for first two
@@ -116,23 +119,23 @@ my $composite;
 if (not $nomouse) {
 	$xdotool = `which xdotool`;
 	chomp($xdotool);
-	$xdotool or warn("xdotool unavailable: mouse cursor will not appear in screenshots\n");
+	$xdotool or warn(__"xdotool unavailable: mouse cursor will not appear in screenshots\n");
 	$composite = `which composite`;
 	chomp($composite);
-	$composite or warn("composite unavailable: mouse cursor will not appear in screenshots\n");
+	$composite or warn(__"composite unavailable: mouse cursor will not appear in screenshots\n");
 }
 my $scrot = `which scrot`;
 chomp($scrot);
-$scrot or die("scrot unavailable: cannot take screenshots\n");
+$scrot or die(__"scrot unavailable: cannot take screenshots\n");
 
 
 sub convertToB64 {
 	if (! -e $_[0]) {
-		warn("Cannot convert $_[0]: no such file or directory\n");
+		warn __x("Cannot convert {file}: no such file or directory\n", file=>$_[0]);
 		return $_[0];
 	}
 	# return `base64 -w 0 $_[0]`; # -w 0 : do not wrap  # should use internal base64
-	open(my $INIMG, "<", $_[0]) or (warn("Cannot open $_[0], this image will be broken!") and return "");
+	open(my $INIMG, "<", $_[0]) or (warn(__x("Cannot open {file}, this image will be broken!", file=>$_[0])) and return "");
 	{ # Slurp mode. If we don't have enough ram, I don't know how it ran in the first place!
 		local $/;
 		my $imgcontent = <$INIMG>;
@@ -166,7 +169,7 @@ sub finish {
 					my $curmousey;
 					$curmousex = $1 - 6; # offset of cursor in image is 6, 3
 					$curmousey = $2 - 3;
-					system("composite -geometry +$curmousex+$curmousey /usr/share/xsr/Cursor.png $i.$imgext $i.$imgext") and warn("Had a problem adding the cursor to image $i\n"); # shell has reversed error codes
+					system("composite -geometry +$curmousex+$curmousey /usr/share/xsr/Cursor.png $i.$imgext $i.$imgext") and warn(__x("Had a problem adding the cursor to image {id}\n", id=>$i)); # shell has reversed error codes
 				}
 			}
 		}
@@ -176,15 +179,15 @@ sub finish {
 			my $xdgopen = `which xdg-open`;
 			chomp($xdgopen);
 			if ($xdgopen) {system("xdg-open \"$tmpdir\"")}
-			print(STDOUT "Initial image processing complete. If you would like to edit the images before the file is saved, they are located in $tmpdir. Press return when finished.\n") if not $quiet;
+			print(STDOUT __x("Initial image processing complete. If you would like to edit the images before the file is saved, they are located in {dir}. Press return when finished.\n", dir=>$tmpdir)) if not $quiet;
 			<STDIN>
 		}
 
 		# this file contains only image associations, not base64
-		open(my $ASSOCFILE, "<", "tmpassoconly.html") or warn("Couldn't open image associations: The resulting file would require manual edit");
+		open(my $ASSOCFILE, "<", "tmpassoconly.html") or warn(__"Couldn't open image associations: The resulting file would require manual edit");
 
 		# this file will either be base64-encoded or associated with the final output *directory*
-		open(my $FINALFILE, ">", "tmpencoded.html") or die("Couldn't open final output file");
+		open(my $FINALFILE, ">", "tmpencoded.html") or die(__"Couldn't open final output file");
 
 		if ($imagedeps) {
 			while (<$ASSOCFILE>) {
@@ -208,26 +211,26 @@ sub finish {
 				copy "$tmpdir/$i.$imgext", "$outfilename_noext/$i.$imgext" or warn("Could not copy image #$i.");
 			} # copy all image files to the dependent directory
 		}
-		copy "$tmpdir/tmpencoded.html", $outfile or warn("Could not write to output: $!"); # put the output in the original directory
-		remove_tree $tmpdir or warn("Unable to remove temporary directory; junk remains in $tmpdir");
+		copy "$tmpdir/tmpencoded.html", $outfile or warn(__"Could not write to output: ".$!); # put the output in the original directory
+		remove_tree $tmpdir or warn(__x("Unable to remove temporary directory; junk remains in {dir}", dir=>$tmpdir));
 	}
 	print(STDOUT "\n") if not $quiet;
 	exit();
 }
 
 if ($countdown) {
-	print(STDOUT "Starting in ");
+	print(STDOUT __"Starting in ");
 	for (my $i = $countdown; $i > 0; $i--) {
 		print(STDOUT $i . "\b");
 		STDOUT->flush();
 		sleep(1);
 	}
-	print(STDOUT "0\nStarted. (Why are you still here?)\n");
+	print(STDOUT "0\n".__"Started. (Why are you still here?)\n");
 }
 
 
 # From here on out the code is inspired by this answer: https://unix.stackexchange.com/a/129171, posted by Stéphane Chazelas
-open(my $X, "-|", "xmodmap -pke") or die("Couldn't open keymap."); # open keymap
+open(my $X, "-|", "xmodmap -pke") or die(__"Couldn't open keymap."); # open keymap
 my %k; # store normal in k, a hash
 my %K; # store shift in K, a hash
 while (<$X>) {
@@ -238,7 +241,7 @@ while (<$X>) {
 }
 
 # open modmap
-open($X, "-|", "xmodmap -pm") or warn("Could not open modifier map: Special keypresses would mess"); <$X>;<$X>;
+open($X, "-|", "xmodmap -pm") or warn(__"Could not open modifier map: Special keypresses would mess"); <$X>;<$X>;
 my $k;
 my @m;
 my $i = 0;
@@ -288,7 +291,7 @@ sub takescreenshot {
 }
 
 # open output file (NOTE: no safety here! Watch out!)
-open($FOUT, ">", "tmpassoconly.html") or warn("Could not open temporary output file");
+open($FOUT, ">", "tmpassoconly.html") or warn(__"Could not open temporary output file");
 
 # header
 print $FOUT <<"/html";
@@ -305,7 +308,7 @@ print $FOUT <<"/html";
 /html
 
 # execute xinput with the monitoring options
-open($XIN, "-|", "xinput --test-xi2 --root") or die("Unable to watch for X input events");
+open($XIN, "-|", "xinput --test-xi2 --root") or die(__"Unable to watch for X input events");
 
 my $e;
 my $d;
