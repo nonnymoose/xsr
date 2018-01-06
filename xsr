@@ -56,7 +56,7 @@ sub usage {
 
 	my $usage_str = __x("Usage: {xsr} [options] [outfile]\n", xsr=>$0);
 
-	$usage_str .= "\n".__"Options:\n"."\n";
+	$usage_str .= "\n".__("Options:\n")."\n";
 	for my $option (keys %options) {
 		$usage_str .= sprintf "  %-${maxoptlen}s %s\n", $option, $options{$option};
 	}
