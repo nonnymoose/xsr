@@ -45,7 +45,7 @@ sub usage {
 		"-e|--edit-images-before-save"	=> __"Edit images before saving file",
 		"-d|--image-deps"		=> __"Do not convert images to base64; instead, output the dependent file and it's resources directory",
 		"-c|--image-extension=ext"	=> __"Extension of image output (png or jpg)",
-		"-u|--capture-focused"		=> __"Captured the focused window only",
+		"-u|--capture-focused"		=> __"Capture the focused window only",
 		"-q|--quiet"			=> __"Supress output to STDOUT",
 		"--no-mouse"			=> __"Do not add mouse to screenshots",
 		"--countdown[=seconds]"		=> __"Display countdown (default 5)",
