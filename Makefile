@@ -1,5 +1,5 @@
 TEXTDOMAIN=io.github.nonnymoose.xsr
-TRANSLATIONS=hu
+TRANSLATIONS=$(basename $(notdir $(wildcard po/*.po)))
 
 .PHONY: all
 all: test maint xsr
