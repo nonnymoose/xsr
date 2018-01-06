@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 
 use utf8;
+use List::Util qw(max);
 use Time::HiRes qw/gettimeofday/;
 use sigtrap qw/handler finish normal-signals/;
 use Cwd qw(cwd);
@@ -39,23 +40,28 @@ my %mimetypes = (
 my @mousegrabs = ();
 
 sub usage {
-	return <<endusage;
-Usage: $0 [options] [outfile]
+	my %options = (
+		"-o|--out outfile"		=> __"Output file name (also can be first argument)",
+		"-e|--edit-images-before-save"	=> __"Edit images before saving file",
+		"-d|--image-deps"		=> __"Do not convert images to base64; instead, output the dependent file and it's resources directory",
+		"-c|--image-extension=ext"	=> __"Extension of image output (png or jpg)",
+		"-u|--capture-focused"		=> __"Captured the focused window only",
+		"-q|--quiet"			=> __"Supress output to STDOUT",
+		"--no-mouse"			=> __"Do not add mouse to screenshots",
+		"--countdown[=seconds]"		=> __"Display countdown (default 5)",
+		"--no-countdown"		=> __"Don't display countdown",
+		"-h|--help"			=> __"Print this message",
+	);
+	my $maxoptlen = 0; $maxoptlen = max(map length, keys %options);
 
-Options:
+	my $usage_str = __x("Usage: {xsr} [options] [outfile]\n", xsr=>$0);
 
-  -o|--out outfile		Output file name (also can be first argument)
-  -e|--edit-images-before-save	Edit images before saving file
-  -d|--image-deps		Do not convert images to base64; instead, output the dependent file and it's resources directory
-  -c|--image-extension=ext	Extension of image output (png or jpg)
-  -u|--capture-focused		Captured the focused window only
-  -q|--quiet			Supress output to STDOUT
-  --no-mouse			Do not add mouse to screenshots
-  --countdown[=seconds]		Display countdown (default 5)
-  --no-countdown		Don't display countdown
-  -h|--help			Print this message
+	$usage_str .= "\n".__"Options:\n"."\n";
+	for my $option (keys %options) {
+		$usage_str .= sprintf "  %-${maxoptlen}s %s\n", $option, $options{$option};
+	}
 
-endusage
+	return $usage_str;
 }
 
 GetOptions (
