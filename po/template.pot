@@ -1,0 +1,163 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-01-06 22:17+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: xsr:44
+msgid "Output file name (also can be first argument)"
+msgstr ""
+
+#: xsr:45
+msgid "Edit images before saving file"
+msgstr ""
+
+#: xsr:46
+msgid ""
+"Do not convert images to base64; instead, output the dependent file and it's "
+"resources directory"
+msgstr ""
+
+#: xsr:47
+msgid "Extension of image output (png or jpg)"
+msgstr ""
+
+#: xsr:48
+msgid "Capture the focused window only"
+msgstr ""
+
+#: xsr:49
+msgid "Supress output to STDOUT"
+msgstr ""
+
+#: xsr:50
+msgid "Do not add mouse to screenshots"
+msgstr ""
+
+#: xsr:51
+msgid "Display countdown (default 5)"
+msgstr ""
+
+#: xsr:52
+msgid "Don't display countdown"
+msgstr ""
+
+#: xsr:53
+msgid "Print this message"
+msgstr ""
+
+#: xsr:57
+#, perl-brace-format
+msgid "Usage: {xsr} [options] [outfile]\n"
+msgstr ""
+
+#: xsr:59
+msgid "Options:\n"
+msgstr ""
+
+#: xsr:90
+msgid "Too many arguments.\n"
+msgstr ""
+
+#: xsr:103
+#, perl-brace-format
+msgid ""
+"Invalid file type {imgext}.\n"
+"Accepted file types are:\n"
+"{targettypes}"
+msgstr ""
+
+#: xsr:113
+msgid " Is /tmp mounted?\n"
+msgstr ""
+
+#: xsr:122
+msgid "xdotool unavailable: mouse cursor will not appear in screenshots\n"
+msgstr ""
+
+#: xsr:125
+msgid "composite unavailable: mouse cursor will not appear in screenshots\n"
+msgstr ""
+
+#: xsr:129
+msgid "scrot unavailable: cannot take screenshots\n"
+msgstr ""
+
+#: xsr:134
+#, perl-brace-format
+msgid "Cannot convert {file}: no such file or directory\n"
+msgstr ""
+
+#: xsr:138
+#, perl-brace-format
+msgid "Cannot open {file}, this image will be broken!"
+msgstr ""
+
+#: xsr:172
+#, perl-brace-format
+msgid "Had a problem adding the cursor to image {id}\n"
+msgstr ""
+
+#: xsr:182
+#, perl-brace-format
+msgid ""
+"Initial image processing complete. If you would like to edit the images "
+"before the file is saved, they are located in {dir}. Press return when "
+"finished.\n"
+msgstr ""
+
+#: xsr:187
+msgid ""
+"Couldn't open image associations: The resulting file would require manual "
+"edit"
+msgstr ""
+
+#: xsr:190
+msgid "Couldn't open final output file"
+msgstr ""
+
+#: xsr:214
+msgid "Could not write to output: "
+msgstr ""
+
+#: xsr:215
+#, perl-brace-format
+msgid "Unable to remove temporary directory; junk remains in {dir}"
+msgstr ""
+
+#: xsr:222
+msgid "Starting in "
+msgstr ""
+
+#: xsr:228
+msgid "Started. (Why are you still here?)\n"
+msgstr ""
+
+#: xsr:233
+msgid "Couldn't open keymap."
+msgstr ""
+
+#: xsr:244
+msgid "Could not open modifier map: Special keypresses would mess"
+msgstr ""
+
+#: xsr:294
+msgid "Could not open temporary output file"
+msgstr ""
+
+#: xsr:311
+msgid "Unable to watch for X input events"
+msgstr ""
