@@ -10,6 +10,7 @@ use HTML::Entities qw(encode_entities);
 use Encode qw(encode decode);
 use MIME::Base64 qw(encode_base64); # internal Base64 (see #41)
 use POSIX qw(setlocale LC_ALL);
+use Locale::TextDomain qw(xsr);
 use strict;
 use warnings;
 use Getopt::Long;
