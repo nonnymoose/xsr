@@ -1,0 +1,175 @@
+# xsr, an X Screen Recorder.
+# Copyright (C) 2017
+# This file is distributed under the same license as the nonnymoose/xsr package.
+# Domonkos Lezsák <lezsakdomi1@gmail.com>, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-01-06 15:44+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Domonkos Lezsák <lezsakdomi1@gmail.com>\n"
+"Language-Team: Hungarian <lezsakdomi1@gmail.com>\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: xsr:44
+msgid "Output file name (also can be first argument)"
+msgstr "Kimeneti fájlnév (lehet első paraméter is)"
+
+#: xsr:45
+msgid "Edit images before saving file"
+msgstr "Képek szerkesztése, mielőtt a fájl mentése kerülne"
+
+#: xsr:46
+msgid ""
+"Do not convert images to base64; instead, output the dependent file and it's "
+"resources directory"
+msgstr ""
+"Ne kerüljenek a képek base64.be átkódolva a kimeneti fájlba, hanem csak "
+"az adott fájl neve és a mappája"
+
+#: xsr:47
+msgid "Extension of image output (png or jpg)"
+msgstr "Kimeneti fájl kiterjesztése (png vagy jpg)"
+
+#: xsr:48
+msgid "Capture the focused window only"
+msgstr "Csak a fókuszált ablakról készüljön kép"
+
+#: xsr:49
+msgid "Supress output to STDOUT"
+msgstr "Csendes mód (ne kerüljön semmi a standard kimenetre)"
+
+#: xsr:50
+msgid "Do not add mouse to screenshots"
+msgstr "A kurzor ne kerüljön fel a képernyőmentésekre"
+
+#: xsr:51
+msgid "Display countdown (default 5)"
+msgstr "Visszaszámláló időtartama (alapértelmezés: 5)"
+
+#: xsr:52
+msgid "Don't display countdown"
+msgstr "Ne legyen visszaszámláló"
+
+#: xsr:53
+msgid "Print this message"
+msgstr "Ezen üzenet kiírása"
+
+#: xsr:57
+#, perl-brace-format
+msgid "Usage: {xsr} [options] [outfile]\n"
+msgstr "Használat: {xsr} [opciók] [kimeneti fájl neve]\n"
+
+#: xsr:59
+msgid "Options:\n"
+msgstr "Opciók:\n"
+
+#: xsr:90
+msgid "Too many arguments.\n"
+msgstr "Túl sok argumentum.\n"
+
+#: xsr:103
+#, perl-brace-format
+msgid ""
+"Invalid file type {imgext}.\n"
+"Accepted file types are:\n"
+"{targettypes}"
+msgstr ""
+"Érvénytelen fájltípus {imgext}.\n"
+"A következőek használhatóak:\n"
+"{targettypes}"
+
+#: xsr:113
+msgid " Is /tmp mounted?\n"
+msgstr " Fel van csatolva a /tmp?\n"
+
+#: xsr:122
+msgid "xdotool unavailable: mouse cursor will not appear in screenshots\n"
+msgstr "az xdotool nem elérhető: a kurzor nem fog megjelenni a képeken\n"
+
+#: xsr:125
+msgid "composite unavailable: mouse cursor will not appear in screenshots\n"
+msgstr "a composite nem elérhető: a kurzor nem fog megjelenni a képeken\n"
+
+#: xsr:129
+msgid "scrot unavailable: cannot take screenshots\n"
+msgstr "az scrot nem elérhető: nem lehet képernyőképeket készíteni\n"
+
+#: xsr:134
+#, perl-brace-format
+msgid "Cannot convert {file}: no such file or directory\n"
+msgstr "{file} nem konvertálható: nincs ilyen fájl vagy könyvtár\n"
+
+#: xsr:138
+#, perl-brace-format
+msgid "Cannot open {file}, this image will be broken!"
+msgstr "Nem lehet megnyitni a {file}-t, ez a kép hibás!"
+
+#: xsr:172
+#, perl-brace-format
+msgid "Had a problem adding the cursor to image {id}\n"
+msgstr "Probléma merült fel, miközben a kurzort megpróbáltuk a '{id}' képre illeszteni\n"
+
+#: xsr:182
+#, perl-brace-format
+msgid ""
+"Initial image processing complete. If you would like to edit the images "
+"before the file is saved, they are located in {dir}. Press return when "
+"finished.\n"
+msgstr ""
+"A kezdeti képfeldolgozás elkészült. Ha Ön szeretné a képeket "
+"szerkeszteni, még mielőtt a fájl mentésre kerülne, azt most megteheti: "
+"A fájlok a {dir} mappában találhatóak. Nyomjon entert, miután végzett.\n"
+
+#: xsr:187
+msgid ""
+"Couldn't open image associations: The resulting file would require manual "
+"edit"
+msgstr ""
+"Nem lehet megnyitni a kép-asszociációs fájlt: Valószínűleg szükség lesz "
+"manuális szerkesztésre"
+
+#: xsr:190
+msgid "Couldn't open final output file"
+msgstr "A végső, kimeneti fájlt nem lehet megnyitni"
+
+#: xsr:214
+msgid "Could not write to output: "
+msgstr "A kimenet nem írható: "
+
+#: xsr:215
+#, perl-brace-format
+msgid "Unable to remove temporary directory; junk remains in {dir}"
+msgstr "Nem sikerült az ideiglenes mappa ( {dir} ) törlése, marad benne szemét"
+
+#: xsr:222
+msgid "Starting in "
+msgstr "Indítás: "
+
+#: xsr:228
+msgid "Started. (Why are you still here?)\n"
+msgstr "A felvétel elindult. (Mit keresel még itt?)\n"
+
+#: xsr:233
+msgid "Couldn't open keymap."
+msgstr "A keymap nem nyitható meg."
+
+#: xsr:244
+msgid "Could not open modifier map: Special keypresses would mess"
+msgstr ""
+"A módosítóbillentyű-tábla nem nyitható meg: A speciális billentyűk "
+"kaotikusak lehetnek"
+
+#: xsr:294
+msgid "Could not open temporary output file"
+msgstr "Nem nyitható meg az ideiglenes kimeneti fájl"
+
+#: xsr:311
+msgid "Unable to watch for X input events"
+msgstr "Nem lehet figyelni az X eseményeket"
