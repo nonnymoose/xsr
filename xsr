@@ -17,7 +17,7 @@ use warnings;
 use Getopt::Long;
 use Data::Dumper qw(Dumper);
 
-my $lang="en_US";
+my $lang="en";
 my $locale_dir="locales";
 for my $lang_probe (split /:/, $LANGUAGE) {
 	if (-d $locale_dir."/".$lang_probe) {
