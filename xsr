@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 
 use utf8;
+use Env qw(LANGUAGE);
 use List::Util qw(max);
 use Time::HiRes qw/gettimeofday/;
 use sigtrap qw/handler finish normal-signals/;
@@ -10,15 +11,34 @@ use File::Path qw(remove_tree);
 use HTML::Entities qw(encode_entities);
 use Encode qw(encode decode);
 use MIME::Base64 qw(encode_base64); # internal Base64 (see #41)
-use POSIX qw(setlocale LC_ALL);
 use Locale::TextDomain 'io.github.nonnymoose.xsr';
 use strict;
 use warnings;
 use Getopt::Long;
+use Data::Dumper qw(Dumper);
 
-# get the current locale (minus the character encoding)
-my $locale = setlocale(LC_ALL); # ex. en_US.UTF-8
-$locale =~ s/\..*$//; # ex. en_US
+my $lang="en_US";
+my $locale_dir="locales";
+for my $lang_probe (split /:/, $LANGUAGE) {
+	if (-d $locale_dir."/".$lang_probe) {
+		$lang=$lang_probe;
+		last;
+	}
+	$lang_probe =~ /(?P<language_code>[a-z]{2,})(_(?P<terrority_code>[A-Z]{2,}))?(\.(?P<charset>[A-z0-9-]+))?(@(?P<settings>.*))?/ or (warn __x("Invalid locale: {{locale}}", locale=>$lang_probe) and continue);
+	my @code_sets = ("");
+	for my $part (['@', q(settings)], ['.', q(charset)], ['_', q(terrority_code)]) {
+		if (defined $+{$part->[1]}) {
+			unshift @code_sets, map( {$part->[0].$+{$part->[1]}.$_} @code_sets );
+		}
+	}
+	@code_sets = map {$+{language_code}.$_} @code_sets;
+	for my $lang_partprobe (@code_sets) {
+		if (-d $locale_dir."/".$lang_partprobe) {
+			$lang=$lang_partprobe;
+			last;
+		}
+	}
+}
 
 my $outfile = "Untitled Recording.html";
 my $FOUT; # output filehandle
