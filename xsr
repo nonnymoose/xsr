@@ -15,7 +15,6 @@ use Locale::TextDomain 'io.github.nonnymoose.xsr';
 use strict;
 use warnings;
 use Getopt::Long;
-use Data::Dumper qw(Dumper);
 
 my $lang="en";
 my $locale_dir="locales";
