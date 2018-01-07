@@ -18,23 +18,25 @@ use Getopt::Long;
 
 my $lang="en";
 my $locale_dir="locales";
-for my $lang_probe (split /:/, $LANGUAGE) {
-	if (-d $locale_dir."/".$lang_probe) {
-		$lang=$lang_probe;
-		last;
-	}
-	$lang_probe =~ /(?P<language_code>[a-z]{2,})(_(?P<terrority_code>[A-Z]{2,}))?(\.(?P<charset>[A-z0-9-]+))?(@(?P<settings>.*))?/ or (warn __x("Invalid locale: {{locale}}", locale=>$lang_probe) and next);
-	my @code_sets = ("");
-	for my $part (['@', q(settings)], ['.', q(charset)], ['_', q(terrority_code)]) {
-		if (defined $+{$part->[1]}) {
-			unshift @code_sets, map( {$part->[0].$+{$part->[1]}.$_} @code_sets );
-		}
-	}
-	@code_sets = map {$+{language_code}.$_} @code_sets;
-	for my $lang_partprobe (@code_sets) {
-		if (-d $locale_dir."/".$lang_partprobe) {
-			$lang=$lang_partprobe;
+if (defined $LANGUAGE) {
+	for my $lang_probe (split /:/, $LANGUAGE) {
+		if (-d $locale_dir."/".$lang_probe) {
+			$lang=$lang_probe;
 			last;
+		}
+		$lang_probe =~ /(?P<language_code>[a-z]{2,})(_(?P<terrority_code>[A-Z]{2,}))?(\.(?P<charset>[A-z0-9-]+))?(@(?P<settings>.*))?/ or (warn __x("Invalid locale: {{locale}}", locale=>$lang_probe) and next);
+		my @code_sets = ("");
+		for my $part (['@', q(settings)], ['.', q(charset)], ['_', q(terrority_code)]) {
+			if (defined $+{$part->[1]}) {
+				unshift @code_sets, map( {$part->[0].$+{$part->[1]}.$_} @code_sets );
+			}
+		}
+		@code_sets = map {$+{language_code}.$_} @code_sets;
+		for my $lang_partprobe (@code_sets) {
+			if (-d $locale_dir."/".$lang_partprobe) {
+				$lang=$lang_partprobe;
+				last;
+			}
 		}
 	}
 }
