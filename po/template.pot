@@ -1,59 +1,64 @@
-#: xsr:44
+#: xsr:26
+#, perl-brace-format
+msgid "Invalid locale: {{locale}}"
+msgstr ""
+
+#: xsr:63
 msgid "Output file name (also can be first argument)"
 msgstr ""
 
-#: xsr:45
+#: xsr:64
 msgid "Edit images before saving file"
 msgstr ""
 
-#: xsr:46
+#: xsr:65
 msgid ""
 "Do not convert images to base64; instead, output the dependent file and it's "
 "resources directory"
 msgstr ""
 
-#: xsr:47
+#: xsr:66
 msgid "Extension of image output (png or jpg)"
 msgstr ""
 
-#: xsr:48
+#: xsr:67
 msgid "Capture the focused window only"
 msgstr ""
 
-#: xsr:49
+#: xsr:68
 msgid "Supress output to STDOUT"
 msgstr ""
 
-#: xsr:50
+#: xsr:69
 msgid "Do not add mouse to screenshots"
 msgstr ""
 
-#: xsr:51
+#: xsr:70
 msgid "Display countdown (default 5)"
 msgstr ""
 
-#: xsr:52
+#: xsr:71
 msgid "Don't display countdown"
 msgstr ""
 
-#: xsr:53
+#: xsr:72
 msgid "Print this message"
 msgstr ""
 
-#: xsr:57
+#: xsr:76
 #, perl-brace-format
 msgid "Usage: {xsr} [options] [outfile]\n"
 msgstr ""
 
-#: xsr:59
+#: xsr:78
 msgid "Options:\n"
 msgstr ""
 
-#: xsr:90
+#: xsr:109
 msgid "Too many arguments.\n"
 msgstr ""
 
-#: xsr:103
+#: xsr:122
 #, perl-brace-format
 msgid ""
 "Invalid file type {imgext}.\n"
@@ -61,38 +66,38 @@ msgid ""
 "{targettypes}"
 msgstr ""
 
-#: xsr:113
+#: xsr:132
 msgid " Is /tmp mounted?\n"
 msgstr ""
 
-#: xsr:122
+#: xsr:141
 msgid "xdotool unavailable: mouse cursor will not appear in screenshots\n"
 msgstr ""
 
-#: xsr:125
+#: xsr:144
 msgid "composite unavailable: mouse cursor will not appear in screenshots\n"
 msgstr ""
 
-#: xsr:129
+#: xsr:148
 msgid "scrot unavailable: cannot take screenshots\n"
 msgstr ""
 
-#: xsr:134
+#: xsr:153
 #, perl-brace-format
 msgid "Cannot convert {file}: no such file or directory\n"
 msgstr ""
 
-#: xsr:138
+#: xsr:157
 #, perl-brace-format
 msgid "Cannot open {file}, this image will be broken!"
 msgstr ""
 
-#: xsr:172
+#: xsr:191
 #, perl-brace-format
 msgid "Had a problem adding the cursor to image {id}\n"
 msgstr ""
 
-#: xsr:182
+#: xsr:201
 #, perl-brace-format
 msgid ""
 "Initial image processing complete. If you would like to edit the images "
@@ -100,45 +105,45 @@ msgid ""
 "finished.\n"
 msgstr ""
 
-#: xsr:187
+#: xsr:206
 msgid ""
 "Couldn't open image associations: The resulting file would require manual "
 "edit"
 msgstr ""
 
-#: xsr:190
+#: xsr:209
 msgid "Couldn't open final output file"
 msgstr ""
 
-#: xsr:214
+#: xsr:233
 msgid "Could not write to output: "
 msgstr ""
 
-#: xsr:215
+#: xsr:234
 #, perl-brace-format
 msgid "Unable to remove temporary directory; junk remains in {dir}"
 msgstr ""
 
-#: xsr:222
+#: xsr:241
 msgid "Starting in "
 msgstr ""
 
-#: xsr:228
+#: xsr:247
 msgid "Started. (Why are you still here?)\n"
 msgstr ""
 
-#: xsr:233
+#: xsr:252
 msgid "Couldn't open keymap."
 msgstr ""
 
-#: xsr:244
+#: xsr:263
 msgid "Could not open modifier map: Special keypresses would mess"
 msgstr ""
 
-#: xsr:294
+#: xsr:313
 msgid "Could not open temporary output file"
 msgstr ""
 
-#: xsr:311
+#: xsr:330
 msgid "Unable to watch for X input events"
 msgstr ""
