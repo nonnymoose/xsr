@@ -1,0 +1,173 @@
+# xsr, an X Screen Recorder.
+# Copyright (C) 2017
+# This file is distributed under the same license as the nonnymoose/xsr package.
+# Nonny Moose, 2017.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-01-06 17:10+0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Nonny Moose\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: xsr:44
+msgid "Output file name (also can be first argument)"
+msgstr "El nombre del archivo resultado (este puede ser el primer argumento también)"
+
+#: xsr:45
+msgid "Edit images before saving file"
+msgstr "Edite las imágenes antes de guardar el archivo"
+
+#: xsr:46
+msgid ""
+"Do not convert images to base64; instead, output the dependent file and it's "
+"resources directory"
+msgstr "Genere el archivo dependiente y su directorio de recursos en lugar de "
+"convertir las imágenes a base64."
+
+#: xsr:47
+msgid "Extension of image output (png or jpg)"
+msgstr "La extensión de la imagen resultado (png o jpg)"
+
+#: xsr:48
+msgid "Capture the focused window only"
+msgstr "Solamente capture la ventana centrada"
+
+#: xsr:49
+msgid "Supress output to STDOUT"
+msgstr "Reprima la salida a STDOUT"
+
+#: xsr:50
+msgid "Do not add mouse to screenshots"
+msgstr "No incluya el ratón en las capturas de pantalla"
+
+#: xsr:51
+msgid "Display countdown (default 5)"
+msgstr "Muestre una cuenta regresiva (la condición base es 5 segundos)"
+
+#: xsr:52
+msgid "Don't display countdown"
+msgstr "No muestre una cuenta regresiva"
+
+#: xsr:53
+msgid "Print this message"
+msgstr "Muestre este mensaje"
+
+#: xsr:57
+#, perl-brace-format
+msgid "Usage: {xsr} [options] [outfile]\n"
+msgstr "El uso es: {xsr} [opciones] [archivo resultado]\n"
+
+#: xsr:59
+msgid "Options:\n"
+msgstr "Las opciones son:\n"
+
+#: xsr:90
+msgid "Too many arguments.\n"
+msgstr "Hay demasiados argumentos"
+
+#: xsr:103
+#, perl-brace-format
+msgid ""
+"Invalid file type {imgext}.\n"
+"Accepted file types are:\n"
+"{targettypes}"
+msgstr ""
+"El tipo de archivo {imgext} no es válido.\n"
+"Los tipos de archivo válidos son:\n"
+"{targettypes}"
+
+#: xsr:113
+msgid " Is /tmp mounted?\n"
+msgstr "¿Es /tmp montado?\n"
+
+#: xsr:122
+msgid "xdotool unavailable: mouse cursor will not appear in screenshots\n"
+msgstr "xdotool no es disponible: el cursor del ratón no va a aparecer en las "
+"capturas de pantalla"
+
+#: xsr:125
+msgid "composite unavailable: mouse cursor will not appear in screenshots\n"
+msgstr "composite no es disponible: el cursor del ratón no va a aparecer en las "
+"capturas de pantalla\n"
+
+#: xsr:129
+msgid "scrot unavailable: cannot take screenshots\n"
+msgstr "scrot no es disponible: no puede capturar la pantalla\n"
+
+#: xsr:134
+#, perl-brace-format
+msgid "Cannot convert {file}: no such file or directory\n"
+msgstr "No pude convertir {file}: El fichero o directorio no existe\n"
+
+#: xsr:138
+#, perl-brace-format
+msgid "Cannot open {file}, this image will be broken!"
+msgstr "No puede abrir {file}, ¡esta imagen va a ser averiada!"
+
+#: xsr:172
+#, perl-brace-format
+msgid "Had a problem adding the cursor to image {id}\n"
+msgstr "No pudo incluir el cursor del ratón en la imagen número {id}\n"
+
+#: xsr:182
+#, perl-brace-format
+msgid ""
+"Initial image processing complete. If you would like to edit the images "
+"before the file is saved, they are located in {dir}. Press return when "
+"finished.\n"
+msgstr "El inicial procesamiento de las imágenes está terminado. Si usted "
+"quiere editar las imágenes antes de guardar el archivo, están en {dir}."
+"Pulse la tecla de retorno cuando está terminado.\n"
+
+#: xsr:187
+msgid ""
+"Couldn't open image associations: The resulting file would require manual "
+"edit"
+msgstr "No pudo abrir las asociaciones de las imágenes: El archivo resultado"
+" va a necesitar modificación manual"
+
+#: xsr:190
+msgid "Couldn't open final output file"
+msgstr "No pudo abrir el archivo resultado final"
+
+#: xsr:214
+msgid "Could not write to output: "
+msgstr "No pudo escribir en el archivo resultado: "
+
+#: xsr:215
+#, perl-brace-format
+msgid "Unable to remove temporary directory; junk remains in {dir}"
+msgstr "No pudo borrar el directorio temporal; ya hay basura en {dir}"
+
+#: xsr:222
+msgid "Starting in "
+msgstr "Va a empezar en "
+
+#: xsr:228
+msgid "Started. (Why are you still here?)\n"
+msgstr "Está empezado. (¿Por qué ya estás aquí?)\n"
+
+#: xsr:233
+msgid "Couldn't open keymap."
+msgstr "No pudo abrir la asignación de teclas."
+
+#: xsr:244
+msgid "Could not open modifier map: Special keypresses would mess"
+msgstr "No pudo abrir la asignación de modificadores: Teclas especiales van "
+"a ser averiada"
+
+#: xsr:294
+msgid "Could not open temporary output file"
+msgstr "No pudo abrir el archivo temporal"
+
+#: xsr:311
+msgid "Unable to watch for X input events"
+msgstr "No pudo observar los eventos entrados de X"
