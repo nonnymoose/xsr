@@ -15,13 +15,13 @@ Make sure you have `scrot` installed; I recommend that you have `imagemagick` an
 For example, on Ubuntu/Debian:
 ```
 $version=1.0.0
-sudo apt install m4_print_dependency_list
+sudo apt install scrot imagemagick xdotool
 curl https://github.com/nonnymoose/xsr/releases/download/$version/xsr.tar.gz | sudo tar -xzC /
 ```
 
 ## Installing a custom tree
 
-1. `sudo apt install m4_print_dependency_list make`
+1. `sudo apt install scrot imagemagick xdotool make`
 2. `make`
 3. `sudo make install`
 
