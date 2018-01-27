@@ -7,8 +7,23 @@ The main differences are that this only runs on Linux, that it records your keys
 
 # Installation
 
+## Installing a stable release
+
 See the [Releases Page](https://github.com/nonnymoose/xsr/releases).
 Make sure you have `scrot` installed; I recommend that you have `imagemagick` and `xdotool` installed as well (to add pointer to screenshots).
+
+For example, on Ubuntu/Debian:
+```
+$version=1.0.0
+sudo apt install m4_print_dependency_list
+curl https://github.com/nonnymoose/xsr/releases/download/$version/xsr.tar.gz | sudo tar -xzC /
+```
+
+## Installing a custom tree
+
+1. `sudo apt install m4_print_dependency_list make`
+2. `make`
+3. `sudo make install`
 
 # Usage
 
