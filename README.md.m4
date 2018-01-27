@@ -11,7 +11,7 @@ The main differences are that this only runs on Linux, that it records your keys
 
 See the [Releases Page](https://github.com/nonnymoose/xsr/releases).
 Make sure you have `scrot` installed; I recommend that you have `imagemagick` and `xdotool` installed as well (to add pointer to screenshots).
-m4_define([[[m_print_dependency_list]]], [[[scrot imagemagick xdotool]]])m4_dnl
+m4_define([[[m4_print_dependency_list]]], [[[scrot imagemagick xdotool]]])m4_dnl
 
 For example, on Ubuntu/Debian:
 ```
