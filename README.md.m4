@@ -15,7 +15,7 @@ m4_define([[[m4_print_dependency_list]]], [[[scrot imagemagick xdotool]]])m4_dnl
 
 For example, on Ubuntu/Debian:
 ```
-$version=1.0.0
+version=v1.0.0
 sudo apt install m4_print_dependency_list
 curl https://github.com/nonnymoose/xsr/releases/download/$version/xsr.tar.gz | sudo tar -xzC /
 ```
