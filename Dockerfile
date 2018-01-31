@@ -6,9 +6,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	make \
 	scrot xinput x11-xserver-utils imagemagick xdotool \
 	&& rm -rf /var/lib/apt/lists/*
-
-COPY xsr /usr/bin/xsr
-COPY Cursor.png /usr/share/xsr/Cursor.png
-ENTRYPOINT ["/usr/bin/xsr"]
-
 RUN ["cpanm", "HTML::Entities"]
+
+COPY Cursor.png /usr/share/xsr/Cursor.png
+COPY xsr /usr/bin/xsr
+ENTRYPOINT ["/usr/bin/xsr"]
