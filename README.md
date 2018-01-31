@@ -14,7 +14,7 @@ Make sure you have `scrot` installed; I recommend that you have `imagemagick` an
 
 For example, on Ubuntu/Debian:
 ```
-$version=1.0.0
+version=v1.0.0
 sudo apt install scrot imagemagick xdotool
 curl https://github.com/nonnymoose/xsr/releases/download/$version/xsr.tar.gz | sudo tar -xzC /
 ```
