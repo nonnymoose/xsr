@@ -38,6 +38,10 @@ $(RECORDING_FILE): docker-image $(X_SOCKET) $(XAUTHORITY)
 		-e XAUTHORITY=/tmp/imported.Xauthority \
 		$(DOCKER_TAG) /tmp/record.html $(ARGS)
 
+.PHONY: run
+# syntactic sugar
+run: $(RECORDING_FILE)
+
 # https://stackoverflow.com/questions/16296753/can-you-run-gui-apps-in-a-docker-container/25280523#25280523
 .Xauthority:
 	xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $@ nmerge -
