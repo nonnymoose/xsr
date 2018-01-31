@@ -15,15 +15,16 @@ Make sure you have `scrot` installed; I recommend that you have `imagemagick` an
 For example, on Ubuntu/Debian:
 ```
 version=v1.0.0
-sudo apt install scrot imagemagick xdotool
+sudo apt install perl scrot imagemagick xdotool xinput x11-xserver-utils
 curl https://github.com/nonnymoose/xsr/releases/download/$version/xsr.tar.gz | sudo tar -xzC /
 ```
 
 ## Installing a custom tree
 
-1. `sudo apt install scrot imagemagick xdotool make`
-2. `make`
-3. `sudo make install`
+1. `sudo apt install perl scrot imagemagick xdotool xinput x11-xserver-utils make cpanminus gcc libc-dev`
+2. `cpanm HTML::Entities`
+3. `make`
+4. `sudo make install`
 
 # Usage
 
