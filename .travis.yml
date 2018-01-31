@@ -2,6 +2,7 @@ language: perl
 sudo: required
 services:
         - docker
+install: true
 
 jobs:
         include:
