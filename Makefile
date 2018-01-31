@@ -7,19 +7,20 @@ all: test maint xsr docker-image
 
 .PHONY: test
 test: test-help test-record
+
 test-help: xsr
 	./$< $(TEST_ARGS) 2>&1 1>/dev/null | [[ `tee >(cat >&2) | wc -c` -eq 0 ]]
 
-test-record:
+test-record: docker-image
 	( \
-		inotifywait -e OPEN $(RECORDING_FILE) \
+		touch $(RECORDING_FILE) && inotifywait -e OPEN $(RECORDING_FILE) \
 		&& echo "Received wait event. Simulating a click and ending record" \
 		&& sleep 1 && xdotool click 1 \
 		&& sleep 0.2 && xdotool key Pause \
 		&& xdotool click 1 \
 	) & \
 	( \
-		sleep 0.5 && $(MAKE) run \
+		sleep 0.5 && timeout --foreground 5 $(MAKE) run | tee >(cat >&2) | ( ! grep 'at /usr/bin/xsr line' ) \
 	)
 
 .PHONY: maint
