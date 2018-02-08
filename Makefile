@@ -16,7 +16,7 @@ test-record: docker-image
 		touch $(RECORDING_FILE) && inotifywait -e OPEN $(RECORDING_FILE) \
 		&& echo "Received wait event. Simulating a click and ending record" \
 		&& sleep 1 && xdotool click 1 \
-		&& sleep 0.2 && xdotool key Pause \
+		&& sleep 0.2 && xdotool key Shift+Pause \
 		&& xdotool click 1 \
 	) & \
 	( \
