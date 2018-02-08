@@ -1,9 +1,19 @@
 language: perl
+sudo: required
+services:
+        - docker
 install: true
 
 jobs:
         include:
-                - script: make test
+                - stage: test
+                  install:
+                          - sudo apt-get install inotify-tools realpath xdotool
+                  before_script:
+                          - export DISPLAY=:99.0
+                          - sh -e /etc/init.d/xvfb start
+                          - sleep 3 # give xvfb some time to start
+                  script: make test
                 - stage: maintain
                   before_install:
                           - git config user.name TravisCI
