@@ -11,7 +11,7 @@ test: test-help test-record
 test-help: xsr
 	./$< $(TEST_ARGS) 2>&1 1>/dev/null | [[ `tee >(cat >&2) | wc -c` -eq 0 ]]
 
-test-record: docker-image
+test-record: docker-image .Xauthority
 	( \
 		touch $(RECORDING_FILE) && inotifywait -e OPEN $(RECORDING_FILE) \
 		&& echo "Received wait event. Simulating a click and ending record" \
@@ -38,15 +38,15 @@ docker-image: Dockerfile
 	$(DOCKER) build . -t $(DOCKER_TAG)
 
 X_SOCKET=/tmp/.X11-unix
-XAUTHORITY=.Xauthority
+DOCKER_XAUTHORITY=.Xauthority
 ARGS=--no-countdown
 RECORDING_FILE=record.html
-$(RECORDING_FILE): docker-image $(X_SOCKET) $(XAUTHORITY)
+$(RECORDING_FILE): docker-image $(X_SOCKET) $(DOCKER_XAUTHORITY)
 	touch $@
 # Getting realpath for $@ needs to be done at shell level, because else it would get touched after make expansion is done
 	$(DOCKER) run -it --rm \
 		-v $(realpath $(X_SOCKET)):$(realpath $(X_SOCKET)) \
-		-v $(realpath $(XAUTHORITY)):/tmp/imported.Xauthority \
+		-v $(realpath $(DOCKER_XAUTHORITY)):/tmp/imported.Xauthority \
 		-v "`realpath $@`":/tmp/record.html \
 		-e DISPLAY=$(DISPLAY) \
 		-e XAUTHORITY=/tmp/imported.Xauthority \
@@ -58,7 +58,8 @@ run: $(RECORDING_FILE)
 
 # https://stackoverflow.com/questions/16296753/can-you-run-gui-apps-in-a-docker-container/25280523#25280523
 .Xauthority:
-	xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $@ nmerge -
+	touch $@
+	xauth nlist :0 | sed -e 's/^..../ffff/' | tee >(cat >&2) | xauth -f $@ nmerge -
 
 .PHONY: open-record
 open-record: $(RECORDING_FILE)
