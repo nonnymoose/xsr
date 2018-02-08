@@ -64,3 +64,16 @@ run: $(RECORDING_FILE)
 .PHONY: open-record
 open-record: $(RECORDING_FILE)
 	xdg-open $<
+
+.PHONY: maint-clean
+maint-clean: clean
+	-rm README.md
+
+.PHONY: clean
+clean: mostlyclean
+	-$(DOCKER) rmi $(DOCKER_TAG)
+
+.PHONY: mostlyclean
+mostlyclean:
+	-rm record.html
+	-rm .Xauthority
