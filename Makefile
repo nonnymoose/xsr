@@ -1,4 +1,4 @@
-SHELL:=/bin/bash -e
+SHELL:=/bin/bash -eo pipefail
 
 TEST_ARGS=--help
 
