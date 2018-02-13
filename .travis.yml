@@ -1,5 +1,6 @@
 language: perl
-install: true
+install:
+        - cpanm Locale::TextDomain
 
 jobs:
         include:

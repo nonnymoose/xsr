@@ -17,17 +17,16 @@ Usage: xsr [options] [outfile]
 
 Options:
 
-  -o|--out outfile		Output file name (also can be first argument)
-  -e|--edit-images-before-save	Edit images before saving file
-  -d|--image-deps		Do not convert images to base64; instead, output the dependent file and it's resources directory
-  -c|--image-extension=ext	Extension of image output (png or jpg)
-  -u|--capture-focused		Captured the focused window only
-  -q|--quiet			Supress output to STDOUT
-  --mouse-icon|--cursor=file	Specify cursor image (default: the one installed to /usr/share/xsr/Cursor.png)
-  --no-mouse			Do not add mouse to screenshots
-  --countdown[=seconds]		Display countdown (default 5)
-  --no-countdown		Don't display countdown
-  -h|--help			Print this message
+  --mouse-icon|--cursor=file   Specify cursor image (default: the one installed to /usr/share/xsr/Cursor.png)
+  -u|--capture-focused         Capture the focused window only
+  -e|--edit-images-before-save Edit images before saving file
+  --no-mouse                   Do not add mouse to screenshots
+  -d|--image-deps              Do not convert images to base64; instead, output the dependent file and it's resources directory
+  -c|--image-extension=ext     Extension of image output (png or jpg)
+  -h|--help                    Print this message
+  --countdown[=seconds]        Display countdown (default 5)
+  --no-countdown               Don't display countdown
+  -o|--out outfile             Output file name (also can be first argument)
 ```
 To quit, press `Break` (usually `Shift`+`Pause`). `Ctrl`+`C` works most of time fine too, although xsr will record that keypress.
 
