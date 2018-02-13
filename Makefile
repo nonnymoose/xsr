@@ -1,12 +1,15 @@
+SHELL:=/bin/bash -e
+
 TEXTDOMAIN=io.github.nonnymoose.xsr
 TRANSLATIONS=$(basename $(notdir $(wildcard po/*.po)))
+TEST_ARGS=--help
 
 .PHONY: all
 all: test maint xsr
 
 .PHONY: test
-test:
-	./xsr --help >/dev/null
+test: xsr
+	./$< $(TEST_ARGS) 2>&1 1>/dev/null | [[ `tee >(cat >&2) | wc -c` -eq 0 ]]
 
 .PHONY: maint
 maint: README.md po/template.pot

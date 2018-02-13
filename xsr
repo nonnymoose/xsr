@@ -5,7 +5,7 @@ use Env qw(LANGUAGE);
 use List::Util qw(max);
 use Time::HiRes qw/gettimeofday/;
 use sigtrap qw/handler finish normal-signals/;
-use Cwd qw(cwd);
+use Cwd qw(cwd abs_path);
 use File::Copy qw(copy);
 use File::Path qw(remove_tree);
 use HTML::Entities qw(encode_entities);
@@ -52,6 +52,7 @@ my $imgext="jpg";
 my $focusedcap = 0;
 my $countdown = 5;
 my $screeni = 0; # counter for screenshot number
+my $cursor = "/usr/share/xsr/Cursor.png";
 my $nomouse = 0;
 my %mimetypes = (
 	"png", "image/png",
@@ -68,6 +69,7 @@ sub usage {
 		"-c|--image-extension=ext"	=> __"Extension of image output (png or jpg)",
 		"-u|--capture-focused"		=> __"Capture the focused window only",
 		"-q|--quiet"			=> __"Supress output to STDOUT",
+		"--mouse-icon|--cursor=file"	=> __"Specify cursor image (default: the one installed to /usr/share/xsr/Cursor.png)",
 		"--no-mouse"			=> __"Do not add mouse to screenshots",
 		"--countdown[=seconds]"		=> __"Display countdown (default 5)",
 		"--no-countdown"		=> __"Don't display countdown",
@@ -95,6 +97,7 @@ GetOptions (
 	"quiet|q" => \$quiet,
 	"countdown:i" => \$countdown,
 	"no-countdown" => sub {$countdown = 0},
+	"mouse-icon|cursor=s" => \$cursor,
 	"no-mouse" => \$nomouse,
 	"help|h" => sub {print(STDOUT usage()); exit(0);}
 	) or die("$!\n" . usage());
@@ -112,6 +115,13 @@ else {
 }
 
 if ($quiet) {$countdown = 0;}
+
+if (! -e $cursor) {
+	$nomouse = 1;
+	warn("Cursor image $cursor doesn't exists, therefore capturing mouse is disabled.");
+} else {
+	$cursor = abs_path($cursor);
+}
 
 my $outfilename = $outfile;
 $outfilename =~ s/^.*\///;
@@ -190,7 +200,7 @@ sub finish {
 					my $curmousey;
 					$curmousex = $1 - 6; # offset of cursor in image is 6, 3
 					$curmousey = $2 - 3;
-					system("composite -geometry +$curmousex+$curmousey /usr/share/xsr/Cursor.png $i.$imgext $i.$imgext") and warn(__x("Had a problem adding the cursor to image {id}\n", id=>$i)); # shell has reversed error codes
+					system("composite -geometry +$curmousex+$curmousey $cursor $i.$imgext $i.$imgext") and warn(__x("Had a problem adding the cursor to image {id}\n", id=>$i)); # shell has reversed error codes
 				}
 			}
 		}
