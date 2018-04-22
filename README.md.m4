@@ -7,8 +7,26 @@ The main differences are that this only runs on Linux, that it records your keys
 
 # Installation
 
+## Installing a stable release
+
 See the [Releases Page](https://github.com/nonnymoose/xsr/releases).
 Make sure you have `scrot` installed; I recommend that you have `imagemagick` and `xdotool` installed as well (to add pointer to screenshots).
+m4_define([[[m4_print_dependency_list]]], [[[scrot imagemagick xdotool xinput x11-xserver-utils]]])m4_dnl
+m4_define([[[m4_print_cpan_dependency_list]]], [[[HTML::Entities]]])m4_dnl
+
+For example, on Ubuntu/Debian:
+```
+version=v1.0.0
+sudo apt install perl m4_print_dependency_list
+curl https://github.com/nonnymoose/xsr/releases/download/$version/xsr.tar.gz | sudo tar -xzC /
+```
+
+## Installing a custom tree
+
+1. `sudo apt install perl m4_print_dependency_list make cpanminus gcc libc-dev`
+2. `cpanm m4_print_cpan_dependency_list`
+3. `make`
+4. `sudo make install`
 
 # Usage
 
