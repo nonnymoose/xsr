@@ -16,7 +16,7 @@ where options are:\n\n\
 --verbose|-v			Print detailed information to stdout;\n\n\
 --countdown sec			Wait sec seconds before beginning to record.\n\
 				Default 5\n\n\
-https://github.com/nonnymoose/xsr" << std::endl;
+https://github.com/nonnymoose/xsr" << std::endl; // this looks funny but it looks good on a terminal, okay? :P
 }
 
 bool parse_arguments (int argc, char** argv) {
@@ -29,14 +29,14 @@ bool parse_arguments (int argc, char** argv) {
 		{"help", no_argument, nullptr, 'h'},
 		{"verbose", no_argument, nullptr, 'v'},
 		// {"mouse-icon", required_argument, nullptr, 1},
-		// {"cursor", required_argument, nullptr, 1},
+		// {"cursor", required_argument, nullptr, 1}, // heretofore unimplemented
 		// {"no-mouse", no_argument, nullptr, 2},
 		{"countdown", optional_argument, nullptr, 3}
 	};
 	while (true) {
 		const auto option = getopt_long(argc, argv, shortoptions, longoptions, nullptr);
 		if (option == -1) {
-			break;
+			break; // at first I wanted to put this in a case -1: but you can't
 		}
 		switch (option) {
 			case 'o':
@@ -54,7 +54,7 @@ bool parse_arguments (int argc, char** argv) {
 			//
 			case '?':
 			case 'h':
-				show_help(argv[0]);
+				show_help(argv[0]); // show_help uses the program name
 				return true; // do return
 				break;
 			//
@@ -80,20 +80,18 @@ bool parse_arguments (int argc, char** argv) {
 				}
 				break;
 			//
-			case 'e':
-				options.edit_before_save = true;
-				break;
-			//
 			default:
 				//no-op
 				break;
 		}
 	}
 	if (optind < argc) {
-		options.outfile = argv[optind++];
+		options.outfile = argv[optind++]; // output file specified on command line
 	}
-	if (optind < argc) {
-		std::cerr << "Warning: One or more spurious non-option arguments!" << '\n';
+	if (optind < argc && ! options.quiet) {
+		std::cerr << "Warning: One or more spurious non-option arguments!" << std::endl;
+		// the reason I'm using std::endl in cerr even though it's unbuffered is we
+		// might eventually change the output for these sorts of things to print to a bufferred output
 	}
 	return false;
 }

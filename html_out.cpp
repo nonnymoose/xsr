@@ -17,12 +17,12 @@
 #include "xsrdata.h"
 #include "to_png.h"
 
-const std::string mimetype = "image/png;base64,";
+const std::string mimetype = "image/png;base64,"; // if we make other output formats this could be stored differently
 std::ofstream fout;
 
 bool this_thread_exit_cleanly = false; // this thread has its own because it needs to empty the queue first.
 
-bool checkData() {
+bool checkData() { // return whether there is data in the queue
 	bool result;
 	XSRDataQueueMutex.lock();
 	result = ! XSRDataQueue.empty();
@@ -39,11 +39,11 @@ void writeScreenshot(XImage* screenshot) {
 
 void* html_out(void *) {
 	fout.open(options.outfile);
-	fout << XSR_HTML::header << "\n" << XSR_HTML::title() << "\n";
+	fout << XSR_HTML::header << "\n" << XSR_HTML::title() << "\n"; // print out the html header + document title
 	while (! this_thread_exit_cleanly) {
 		std::unique_lock<std::mutex> dataLock(XSRDataQueueMutex);
-		XSRDataAvailable.wait(dataLock, []{return XSRDataAvailableBoolean;});
-		dataLock.unlock();
+		XSRDataAvailable.wait(dataLock, []{return XSRDataAvailableBoolean;}); // wait for stuff to be in the queue
+		dataLock.unlock(); // do this to minimize queue locking time so that the other thread can write to it while we're processing data in the background
 		while (checkData() && ! this_thread_exit_cleanly) {
 			XSRData thisData;
 			XSRDataQueueMutex.lock();
@@ -57,13 +57,15 @@ void* html_out(void *) {
 					fout << "Type: ";
 					for (auto i = thisData.presses.begin(); i != thisData.presses.end(); i++) {
 						if (i->isModifier) {
-							fout << "<kbd>" << i->description << "</kbd>+";
+							fout << "<kbd>" << i->description << "</kbd>+"; // modifiers get styling
 						}
 						else if (i->description.size() == 1) {
 							fout << i->description;
 						}
 						else {
-							fout << "<kbd>" << i->description << "</kbd>";
+							fout << "<kbd>" << i->description << "</kbd>"; // keys with descriptions longer than one character get styling
+							// this includes the backspace (⌫) and delete (⌦) special characters!
+							// this is because they are unicode and more than one byte. THIS IS INTENDED BEHAVIOR
 						}
 					}
 					fout << '\n';
@@ -73,7 +75,7 @@ void* html_out(void *) {
 				{
 					for (auto i = thisData.presses.begin(); i != thisData.presses.end(); i++) {
 						if (i->isModifier) {
-							fout << "<kbd>" << i->description << "</kbd>+";
+							fout << "<kbd>" << i->description << "</kbd>+"; // modifiers on mouse clicks get treated as special keys (because they are)
 						}
 						else {
 							fout << i->description;

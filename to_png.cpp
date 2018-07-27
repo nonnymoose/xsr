@@ -8,7 +8,7 @@
 
 static void PngWriteCallback(png_structp  png_ptr, png_bytep data, png_size_t length) {
 	std::vector<char> *writeptr = (std::vector<char>*)png_get_io_ptr(png_ptr);
-	writeptr->insert(writeptr->end(), data, data + length);
+	writeptr->insert(writeptr->end(), data, data + length); // append data to vector
 }
 
 std::vector<unsigned char> XImageToPNG(XImage *img) {
@@ -36,7 +36,7 @@ std::vector<unsigned char> XImageToPNG(XImage *img) {
 	for (int y = 0; y < img->height; y++) {
 		for (int x = 0; x < img->width; x++) {
 			unsigned long pixel = XGetPixel(img, x, y);
-			unsigned char blue = pixel & blue_mask;
+			unsigned char blue = pixel & blue_mask; // each value is 8 bits of the pixel
 			unsigned char green = (pixel & green_mask) >> 8;
 			unsigned char red = (pixel & red_mask) >> 16;
 			// png_byte *ptr = (png_row[x * 3]);

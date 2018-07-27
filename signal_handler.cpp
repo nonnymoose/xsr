@@ -24,5 +24,5 @@ void setup_signal_handler() {
 	sigaddset(&global_signal_mask, SIGALRM);
 	sigaddset(&global_signal_mask, SIGTERM);
 	pthread_sigmask(SIG_BLOCK, &global_signal_mask, NULL);
-	pthread_create(&signal_handler_thread, NULL, signal_handler, NULL);
+	pthread_create(&signal_handler_thread, NULL, signal_handler, NULL); // spawn the thread that handles signals
 }
