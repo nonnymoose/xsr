@@ -2,7 +2,9 @@
 #include <pthread.h> // I would use std::thread but there's no support for catching signals
 #include <csignal>
 #include <atomic> // I hope it's ok to mix std::atomic with pthread
+#include <iostream>
 #include "signal_handler.h"
+#include "arg_parser.h"
 
 sigset_t global_signal_mask;
 pthread_t signal_handler_thread; // I didn't want to make this global at first but I might want it later
@@ -11,6 +13,7 @@ std::atomic<bool> exit_cleanly (false);
 void* signal_handler(void *) {
 	int unused;
 	sigwait(&global_signal_mask, &unused); // we know that we only need to trap one type of signal: clean exit
+	if (options.verbose) std::cerr << "[signal_handler] Caught signal, triggering clean exit" << std::endl;
 	exit_cleanly.store(true);
 	return 0;
 }

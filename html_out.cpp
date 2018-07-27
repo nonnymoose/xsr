@@ -39,6 +39,7 @@ void writeScreenshot(XImage* screenshot) {
 
 void* html_out(void *) {
 	fout.open(options.outfile);
+	if (options.verbose) std::cerr << "[html_out] Opened outfile." << std::endl;
 	fout << XSR_HTML::header << "\n" << XSR_HTML::title() << "\n"; // print out the html header + document title
 	while (! this_thread_exit_cleanly) {
 		std::unique_lock<std::mutex> dataLock(XSRDataQueueMutex);
@@ -90,6 +91,7 @@ void* html_out(void *) {
 				case XSRDataType::EXIT:
 					this_thread_exit_cleanly = true;
 					fout << "[End recording]" << '\n';
+					if (options.verbose) std::cerr << "[html_out] End recording" << '\n';
 					break;
 				default:
 					// std::cerr << "PROBLEM";
@@ -106,6 +108,7 @@ void* html_out(void *) {
 	}
 	fout << XSR_HTML::footer;
 	fout.close();
-	// std::cerr << "thread html_out clean exit" << std::endl;
+	if (options.verbose) std::cerr << "[html_out] Closed outfile" << std::endl;
+	if (options.verbose) std::cerr << "[html_out] Clean exit" << std::endl;
 	return 0;
 }

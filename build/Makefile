@@ -27,9 +27,9 @@ clean:
 	-rm -rf *.o xsr
 
 arg_parser.o: arg_parser.h
-html_out.o: signal_handler.h html_out.h html_template.h xsrdata.h to_png.h
-signal_handler.o: signal_handler.h
-xievent.o: signal_handler.h xsrdata.h xievent.h remap.h
-main.o: arg_parser.h signal_handler.h xievent.h html_out.h
+html_out.o: signal_handler.h html_out.h html_template.h xsrdata.h to_png.h arg_parser.h
+signal_handler.o: signal_handler.h arg_parser.h
+xievent.o: signal_handler.h xsrdata.h xievent.h remap.h arg_parser.h arg_parser.h
+main.o: arg_parser.h signal_handler.h xievent.h html_out.h arg_parser.h
 base64.o: base64.h
 to_png.o: to_png.h

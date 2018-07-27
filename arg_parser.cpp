@@ -12,8 +12,9 @@ where options are:\n\n\
 				\"Untitled Recording.html\"\n\n\
 --image-extension|-c ext	Use the image format with extension ext. \n\
 				Default: png; supported: png\n\n\
---quiet|-q			Do not print to stdout. Implied by \"-o -\"\n\n\
---verbose|-v			Print detailed information to stdout;\n\n\
+--quiet|-q			Do not print to stdout or stderr\n\
+				(except in case of a crash). Implied by \"-o -\"\n\n\
+--verbose|-v			Print detailed information to stdout or stderr;\n\n\
 --countdown sec			Wait sec seconds before beginning to record.\n\
 				Default 5\n\n\
 https://github.com/nonnymoose/xsr" << std::endl; // this looks funny but it looks good on a terminal, okay? :P

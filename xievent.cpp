@@ -13,6 +13,7 @@
 #include <X11/Xutil.h>
 #include <X11/XKBlib.h>
 #include "signal_handler.h"
+#include "arg_parser.h"
 #include "xsrdata.h"
 #include "xievent.h"
 
@@ -56,6 +57,7 @@ void setupModifiers(Display *display) {
 		// std::cerr << mod << '\n';
 		modifierBitMap[1 << i] = mod; // each level gets its own bit, so that's how we'll check it too.
 	}
+	if (options.verbose) std::cerr << "[xievent] Processed modifiers" << std::endl;
 
 	XFreeModifiermap(modmap);
 }
@@ -119,6 +121,7 @@ void* xievent(void *) {
 	bool draggedSincePress = false;
 	short int lastScrollDirection = 0; //-1 for down, 1 for up. Used to prevent consecutive scroll directions in the same direction
 	
+	if (options.verbose) std::cerr << "[xievent] Event collection started" << std::endl;
 	while (! exit_cleanly) {
 		XEvent ev;
 		XNextEvent(display, &ev);
@@ -182,6 +185,7 @@ void* xievent(void *) {
 							if (key == "}" && (event->mods.effective & 0b00001101) == 0b00001101) {
 								// ctrl+shift+alt+] == exit
 								// I wanted to put this above the modifier lookup because then I wouldn't have to erase the modifiers from the list, but the key lookup must occur after the modifier lookup :(
+								if (options.verbose) std::cerr << "[xievent] Quit hotkey, triggering clean exit" << std::endl;
 								auto erase_beginning = typed_string.end();
 								erase_beginning--;
 								erase_beginning--;
@@ -296,6 +300,6 @@ void* xievent(void *) {
 	}
 	XSRData thisData((XImage*)nullptr, XSRDataType::EXIT); // tell other thread to clean exit
 	sendData(std::move(thisData));
-	// std::cerr << "thread xievent clean exit" << std::endl;
+	if (options.verbose) std::cerr << "[xievent] Clean exit" << std::endl;
 	return 0;
 }

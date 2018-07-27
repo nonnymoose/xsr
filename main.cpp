@@ -15,6 +15,7 @@ int main(int argc, char** argv) {
 	// process arguments
 	if (parse_arguments(argc, argv)) {return 1;} // return if instructed to do so by parse_arguments
 	setup_signal_handler(); // I wonder if we could do signal handling in the main thread?
+	if (options.verbose) std::cerr << "[main] Created signal handler thread" << std::endl;
 	if (! options.quiet) {
 		std::cerr << "Starting in " << options.countdown;
 		for (int i = options.countdown - 1; i >= 0; i--) { // start as soon as i reaches 0
@@ -26,9 +27,11 @@ int main(int argc, char** argv) {
 	pthread_t eventHandler;
 	pthread_t htmlHandler;
 	pthread_create(&eventHandler, NULL, xievent, NULL); // spawn the threads that do the work
+	if (options.verbose) std::cerr << "[main] Created thread [xievent]" << std::endl;
 	pthread_create(&htmlHandler, NULL, html_out, NULL);
+	if (options.verbose) std::cerr << "[main] Created thread [html_out]" << std::endl;
 	pthread_join(eventHandler, nullptr); // wait for threads to exit
 	pthread_join(htmlHandler, nullptr);
-	// std::cerr << "Exiting cleanly now." << std::endl;
+	if (options.verbose) std::cerr << "[main] Exiting cleanly now." << std::endl;
 	return 0;
 }
