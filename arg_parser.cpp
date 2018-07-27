@@ -89,5 +89,11 @@ bool parse_arguments (int argc, char** argv) {
 				break;
 		}
 	}
+	if (optind < argc) {
+		options.outfile = argv[optind++];
+	}
+	if (optind < argc) {
+		std::cerr << "Warning: One or more spurious non-option arguments!" << '\n';
+	}
 	return false;
 }
