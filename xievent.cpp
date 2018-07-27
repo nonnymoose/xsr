@@ -57,7 +57,7 @@ void setupModifiers(Display *display) {
 		// std::cerr << mod << '\n';
 		modifierBitMap[1 << i] = mod; // each level gets its own bit, so that's how we'll check it too.
 	}
-	if (options.verbose) std::cerr << "[xievent] Processed modifiers" << std::endl;
+	VB std::cerr << '[' << __FILE__ << "] Processed modifiers" << std::endl;
 
 	XFreeModifiermap(modmap);
 }
@@ -121,7 +121,7 @@ void* xievent(void *) {
 	bool draggedSincePress = false;
 	short int lastScrollDirection = 0; //-1 for down, 1 for up. Used to prevent consecutive scroll directions in the same direction
 	
-	if (options.verbose) std::cerr << "[xievent] Event collection started" << std::endl;
+	VB std::cerr << '[' << __FILE__ << "] Event collection started" << std::endl;
 	while (! exit_cleanly) {
 		XEvent ev;
 		XNextEvent(display, &ev);
@@ -137,6 +137,7 @@ void* xievent(void *) {
 						bool shifted = false; // whether or not to go up a level because the shift key is pressed
 						if (modifierKeyCodes.find(event->detail) == modifierKeyCodes.end()) { // only print the press event if it's not a modifier
 							lastKeyWasModifier = false;
+							VVB std::cerr << '[' << __FILE__ << "] Keypress: ";
 							for (auto i: modifierBitMap) {
 								if (event->mods.effective & i.first) { // check each modifier bit and print if significant
 									if (key.substr(0, 3) == "KP_") { // numpad
@@ -146,6 +147,7 @@ void* xievent(void *) {
 										}
 										else if (i.second != "Caps_Lock"&& i.second != "Num_Lock") {
 											// std::cerr << "<kbd>" << i.second << "</kbd>+";
+											if (options.very_verbose) std::cerr << i.second << '+';
 											typed_string.emplace_back(i.second, true); // construct an XSRPress with the key description and the fact that it is a modifier
 										}
 										key.erase(0, 3); // delete preceding KP_
@@ -164,11 +166,13 @@ void* xievent(void *) {
 										}
 										else {
 											// std::cerr << "<kbd>" << i.second << "</kbd>+"; // else print out shift as part of the modifiers
+											if (options.very_verbose) std::cerr << i.second << '+';
 											typed_string.emplace_back(i.second, true);
 										}
 									}
 									else {
 										// std::cerr << "<kbd>" << i.second << "</kbd>+";
+										if (options.very_verbose) std::cerr << i.second << '+';
 										typed_string.emplace_back(i.second, true); // print out modifier
 									}
 								}
@@ -185,7 +189,7 @@ void* xievent(void *) {
 							if (key == "}" && (event->mods.effective & 0b00001101) == 0b00001101) {
 								// ctrl+shift+alt+] == exit
 								// I wanted to put this above the modifier lookup because then I wouldn't have to erase the modifiers from the list, but the key lookup must occur after the modifier lookup :(
-								if (options.verbose) std::cerr << "[xievent] Quit hotkey, triggering clean exit" << std::endl;
+								VB std::cerr << '[' << __FILE__ << "] Quit hotkey, triggering clean exit" << std::endl;
 								auto erase_beginning = typed_string.end();
 								erase_beginning--;
 								erase_beginning--;
@@ -193,6 +197,7 @@ void* xievent(void *) {
 								exit_cleanly = true;
 								break;
 							}
+							if (options.very_verbose) std::cerr << key << std::endl;
 							typed_string.emplace_back(key, false);
 							if (key == "Enter" || key == "Return" || key == "Linefeed") {
 								// The user pressed return; this will submit forms and such, so we need to screenshot
@@ -223,10 +228,12 @@ void* xievent(void *) {
 							for (auto i: modifierBitMap) {
 								if (event->mods.effective & i.first && i.second != key && i.second != "Num_Lock" && i.second != "Caps_Lock") { // check each modifier bit and print if significant
 									// std::cerr << "<kbd>" << i.second << "</kbd>+";
+									if (options.very_verbose) std::cerr << i.second << '+';
 									typed_string.emplace_back(i.second, true);
 								}
 							}
 							// std::cerr << "<kbd>" << key << "</kbd>";
+							if (options.very_verbose) std::cerr << key << std::endl;
 							typed_string.emplace_back(key, false);
 						}
 						break;
@@ -258,10 +265,12 @@ void* xievent(void *) {
 							thisScreenShot = takeScreenShot(); // only take a screenshot if we're not scrolling
 							lastScrollDirection = 0; // not scrolling anymore
 						}
+						VVB std::cerr << '[' << __FILE__ << "] Mouse press: ";
 						XSRData thisData(thisScreenShot, XSRDataType::click);
 						for (auto i: modifierBitMap) {
 							if (event->mods.effective & i.first && i.second != "Num_Lock" && i.second != "Caps_Lock") { // check each modifier bit and print if significant
 								// std::cerr << "<kbd>" << i.second << "</kbd>+";
+								if (options.very_verbose) std::cerr << i.second << '+';
 								thisData.presses.emplace_back(i.second, true); // again, construct XSRPress as a modifier
 								                                               // this will get printed as a modifier key even if presses represents a mouse press
 							}
@@ -269,10 +278,12 @@ void* xievent(void *) {
 						auto lookedUpButton = lookupmouse.find(event->detail); // look up mouse button labels
 						if (lookedUpButton != lookupmouse.end()) {
 							// std::cerr << lookedUpButton->second;
+							if (options.very_verbose) std::cerr << lookedUpButton->second << std::endl;
 							thisData.presses.emplace_back(lookedUpButton->second, false);
 						}
 						else {
 							// std::cerr << "Mouse button " << event->detail;
+							if (options.very_verbose) std::cerr << "Mouse button " << event->detail << std::endl;
 							thisData.presses.emplace_back("Mouse button " + std::to_string(event->detail), false);
 						}
 						sendData(std::move(thisData));
@@ -287,6 +298,7 @@ void* xievent(void *) {
 							draggedSincePress = false;
 							// screenshot
 							// std::cerr << "... and drag.";
+							VVB std::cerr << '[' << __FILE__ << "] Drag" << std::endl;
 							XSRData thisData(takeScreenShot(), XSRDataType::drag);
 							sendData(std::move(thisData));
 						}
@@ -300,6 +312,6 @@ void* xievent(void *) {
 	}
 	XSRData thisData((XImage*)nullptr, XSRDataType::EXIT); // tell other thread to clean exit
 	sendData(std::move(thisData));
-	if (options.verbose) std::cerr << "[xievent] Clean exit" << std::endl;
+	VB std::cerr << '[' << __FILE__ << "] Clean exit" << std::endl;
 	return 0;
 }

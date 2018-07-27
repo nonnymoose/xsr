@@ -31,16 +31,19 @@ bool checkData() { // return whether there is data in the queue
 }
 
 void writeScreenshot(XImage* screenshot) {
+	VVB std::cerr << '[' << __FILE__ << "] Begin writing screenshot" << std::endl;
 	std::vector<unsigned char> pngimage = XImageToPNG(screenshot);
 	XDestroyImage(screenshot);
 	// std::cerr << "Successfully destroyed image" << std::endl;
 	fout << mimetype << base64_encode(&pngimage[0], pngimage.size());
+	VVB std::cerr << '[' << __FILE__ << "] Finish writing screenshot" << std::endl;
 }
 
 void* html_out(void *) {
 	fout.open(options.outfile);
-	if (options.verbose) std::cerr << "[html_out] Opened outfile." << std::endl;
+	if (options.verbose) std::cerr << '[' << __FILE__ << "] Opened outfile." << std::endl;
 	fout << XSR_HTML::header << "\n" << XSR_HTML::title() << "\n"; // print out the html header + document title
+	VVB std::cerr << '[' << __FILE__ << "] Wrote header" << std::endl;
 	while (! this_thread_exit_cleanly) {
 		std::unique_lock<std::mutex> dataLock(XSRDataQueueMutex);
 		XSRDataAvailable.wait(dataLock, []{return XSRDataAvailableBoolean;}); // wait for stuff to be in the queue
@@ -52,6 +55,7 @@ void* html_out(void *) {
 			XSRDataQueue.pop();
 			XSRDataQueueMutex.unlock();
 			fout << XSR_HTML::tags::instruction << "\n" << XSR_HTML::tags::instruction_title;
+			VVB std::cerr << '[' << __FILE__ << "] Wrote instruction and title tags" << std::endl;
 			switch (thisData.type()) {
 				case XSRDataType::typing:
 				{
@@ -91,7 +95,7 @@ void* html_out(void *) {
 				case XSRDataType::EXIT:
 					this_thread_exit_cleanly = true;
 					fout << "[End recording]" << '\n';
-					if (options.verbose) std::cerr << "[html_out] End recording" << '\n';
+					if (options.verbose) std::cerr << '[' << __FILE__ << "] End recording" << '\n';
 					break;
 				default:
 					// std::cerr << "PROBLEM";
@@ -104,11 +108,13 @@ void* html_out(void *) {
 				fout << XSR_HTML::tags::img_end << "\n";
 			}
 			fout << XSR_HTML::tags::div_end << "\n";
+			VVB std::cerr << '[' << __FILE__ << "] Closed instruction and title tags" << std::endl;
 		}
 	}
 	fout << XSR_HTML::footer;
+	VVB std::cerr << '[' << __FILE__ << "] Wrote footer" << std::endl;
 	fout.close();
-	if (options.verbose) std::cerr << "[html_out] Closed outfile" << std::endl;
-	if (options.verbose) std::cerr << "[html_out] Clean exit" << std::endl;
+	if (options.verbose) std::cerr << '[' << __FILE__ << "] Closed outfile" << std::endl;
+	if (options.verbose) std::cerr << '[' << __FILE__ << "] Clean exit" << std::endl;
 	return 0;
 }

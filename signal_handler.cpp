@@ -13,7 +13,7 @@ std::atomic<bool> exit_cleanly (false);
 void* signal_handler(void *) {
 	int unused;
 	sigwait(&global_signal_mask, &unused); // we know that we only need to trap one type of signal: clean exit
-	if (options.verbose) std::cerr << "[signal_handler] Caught signal, triggering clean exit" << std::endl;
+	if (options.verbose) std::cerr << '[' << __FILE__ << "] Caught signal, triggering clean exit" << std::endl;
 	exit_cleanly.store(true);
 	return 0;
 }

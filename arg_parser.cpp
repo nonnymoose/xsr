@@ -14,7 +14,9 @@ where options are:\n\n\
 				Default: png; supported: png\n\n\
 --quiet|-q			Do not print to stdout or stderr\n\
 				(except in case of a crash). Implied by \"-o -\"\n\n\
---verbose|-v			Print detailed information to stdout or stderr;\n\n\
+--verbose|-v			Print detailed information to stdout or stderr\n\n\
+--very-verbose|-vv		Print even more detailed information, \n\
+				including about individual events!\n\n\
 --countdown sec			Wait sec seconds before beginning to record.\n\
 				Default 5\n\n\
 https://github.com/nonnymoose/xsr" << std::endl; // this looks funny but it looks good on a terminal, okay? :P
@@ -29,6 +31,7 @@ bool parse_arguments (int argc, char** argv) {
 		{"quiet", no_argument, nullptr, 'q'},
 		{"help", no_argument, nullptr, 'h'},
 		{"verbose", no_argument, nullptr, 'v'},
+		{"very-verbose", no_argument, nullptr, '!'},
 		// {"mouse-icon", required_argument, nullptr, 1},
 		// {"cursor", required_argument, nullptr, 1}, // heretofore unimplemented
 		// {"no-mouse", no_argument, nullptr, 2},
@@ -60,6 +63,16 @@ bool parse_arguments (int argc, char** argv) {
 				break;
 			//
 			case 'v':
+				if (options.verbose) {
+					// this option was already specified! be more verbose
+					options.very_verbose = true;
+				}
+				options.verbose = true;
+				options.quiet = false;
+				break;
+			//
+			case '!':
+				options.very_verbose = true;
 				options.verbose = true;
 				options.quiet = false;
 				break;

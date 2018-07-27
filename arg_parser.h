@@ -1,5 +1,9 @@
 #ifndef ARGPARSER
 #define ARGPARSER
+
+#define VB if (options.verbose)
+#define VVB if (options.very_verbose)
+
 class xsr_options {
 	public:
 		std::string outfile;
@@ -9,6 +13,7 @@ class xsr_options {
 		bool capture_focused;
 		bool quiet;
 		bool verbose;
+		bool very_verbose;
 		std::string mouse_icon;
 		bool no_mouse;
 		int countdown;
