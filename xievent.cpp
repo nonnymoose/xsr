@@ -179,6 +179,16 @@ void* xievent(void *) {
 							// 	key = "<kbd>" + key + "</kbd>";
 							// }
 							// std::cerr << key;
+							if (key == "}" && (event->mods.effective & 0b00001101) == 0b00001101) {
+								// ctrl+shift+alt+] == exit
+								// I wanted to put this above the modifier lookup because then I wouldn't have to erase the modifiers from the list, but the key lookup must occur after the modifier lookup :(
+								auto erase_beginning = typed_string.end();
+								erase_beginning--;
+								erase_beginning--;
+								typed_string.erase(erase_beginning, typed_string.end()); // erase the last two modifiers that have been printed (ctrl and alt)
+								exit_cleanly = true;
+								break;
+							}
 							typed_string.emplace_back(key, false);
 							if (key == "Enter" || key == "Return" || key == "Linefeed") {
 								// The user pressed return; this will submit forms and such, so we need to screenshot
