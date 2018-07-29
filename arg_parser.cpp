@@ -8,17 +8,20 @@ xsr_options options;
 void show_help(char* progname) {
 	std::cerr << "Usage: " << progname << " [options] [outfile]\n\
 where options are:\n\n\
---out|-o outfile		Write data to outfile instead of \n\
-				\"Untitled Recording.html\"\n\n\
---image-extension|-c ext	Use the image format with extension ext. \n\
-				Default: png; supported: png\n\n\
---quiet|-q			Do not print to stdout or stderr\n\
-				(except in case of a crash). Implied by \"-o -\"\n\n\
---verbose|-v			Print detailed information to stdout or stderr\n\n\
---very-verbose|-vv		Print even more detailed information, \n\
-				including about individual events!\n\n\
---countdown sec			Wait sec seconds before beginning to record.\n\
-				Default 5\n\n\
+ --out|-o outfile		Write data to outfile instead of \n\
+ 				\"Untitled Recording.html\"\n\
+ --image-extension|-c ext	Use the image format with extension ext. \n\
+ 				Default: png; supported: png\n\
+ --quiet|-q			Do not print to stdout or stderr\n\
+ 				(except in case of a crash). Implied by \"-o -\"\n\
+ --verbose|-v			Print detailed information to stdout or stderr\n\
+ --very-verbose|-vv		Print even more detailed information, \n\
+ 				including about individual events!\n\
+ --countdown sec			Wait sec seconds before beginning to record.\n\
+ 				Default 5\n\
+ --no-countdown			Do not wait before beginning to record.\n\
+ --mouse|-m			Include the mouse cursor in the screenshot (default)\n\
+ --no-mouse			Do not include the mouse cursor\n\
 https://github.com/nonnymoose/xsr" << std::endl; // this looks funny but it looks good on a terminal, okay? :P
 }
 
@@ -32,10 +35,10 @@ bool parse_arguments (int argc, char** argv) {
 		{"help", no_argument, nullptr, 'h'},
 		{"verbose", no_argument, nullptr, 'v'},
 		{"very-verbose", no_argument, nullptr, '!'},
-		// {"mouse-icon", required_argument, nullptr, 1},
-		// {"cursor", required_argument, nullptr, 1}, // heretofore unimplemented
-		// {"no-mouse", no_argument, nullptr, 2},
-		{"countdown", optional_argument, nullptr, 3}
+		{"mouse", no_argument, nullptr, 1},
+		{"no-mouse", no_argument, nullptr, 2},
+		{"countdown", optional_argument, nullptr, 3},
+		{"no-countdown", no_argument, nullptr, 4}
 	};
 	while (true) {
 		const auto option = getopt_long(argc, argv, shortoptions, longoptions, nullptr);
@@ -77,21 +80,25 @@ bool parse_arguments (int argc, char** argv) {
 				options.quiet = false;
 				break;
 			//
-			case '1':
-				options.mouse_icon = optarg;
+			case 1:
+				options.include_mouse = true;
 				break;
 			//
-			case '2':
-				options.no_mouse = true; // 1,2,3 are unimplemented
+			case 2:
+				options.include_mouse = false;
 				break;
 			//
-			case '3':
+			case 3:
 				if (optarg) {
 					options.countdown = std::stoi(optarg);
 				}
 				else {
 					options.countdown = 5;
 				}
+				break;
+			//
+			case 4:
+				options.countdown = 0;
 				break;
 			//
 			default:

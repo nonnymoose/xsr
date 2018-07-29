@@ -14,7 +14,7 @@
 int main(int argc, char** argv) {
 	// process arguments
 	if (parse_arguments(argc, argv)) {return 1;} // return if instructed to do so by parse_arguments
-	if (! options.quiet) {
+	if (! options.quiet && options.countdown) {
 		std::cerr << "Starting in " << options.countdown;
 		for (int i = options.countdown - 1; i >= 0; i--) { // start as soon as i reaches 0
 			std::this_thread::sleep_for(std::chrono::seconds(1));

@@ -9,6 +9,7 @@
 #include <condition_variable>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/extensions/Xfixes.h>
 #include "base64/base64.h"
 #include "arg_parser.h"
 #include "signal_handler.h"
@@ -16,6 +17,7 @@
 #include "html_template.h"
 #include "xsrdata.h"
 #include "to_png.h"
+#include "cursor_image.h"
 
 const std::string mimetype = "image/png;base64,"; // if we make other output formats this could be stored differently
 std::ofstream fout;
@@ -103,6 +105,9 @@ void* html_out(void *) {
 			}
 			fout << XSR_HTML::tags::div_end << "\n";
 			if (thisData.screenshot() != nullptr) {
+				if (thisData.cursor() != nullptr) {
+					compositeCursorOntoXImage(thisData.screenshot(), thisData.cursor());
+				}
 				fout << XSR_HTML::tags::img_start;
 				writeScreenshot(thisData.screenshot());
 				fout << XSR_HTML::tags::img_end << "\n";

@@ -5,6 +5,7 @@ queue
 mutex
 condition_variable
 X11/Xlib.h
+X11/extensions/Xfixes.h
 */
 
 class XSRPress { // can hold keypress or mouse press; if it holds a mouse press but isModifier is true, it should be treated as a keypress (see TODO for more information)
@@ -24,21 +25,26 @@ enum class XSRDataType {
 class XSRData {
 	private:
 		XImage *screenshot_;
+		XFixesCursorImage *cursor_;
 		XSRDataType type_;
 	public:
 		XImage* screenshot() {
 			return screenshot_;
 		}
+		XFixesCursorImage* cursor() {
+			return cursor_;
+		}
 		XSRDataType type() {
 			return type_;
 		}
 		std::list<XSRPress> presses;
-		XSRData() : screenshot_((XImage*)nullptr), type_(XSRDataType::typing) {}
-		XSRData(XImage *screenshot__, XSRDataType type__) : screenshot_(screenshot__), type_(type__) {}
-		XSRData(XImage *screenshot__, std::list<XSRPress>&& presses_, XSRDataType type__) : screenshot_(screenshot__), type_(type__), presses(presses_) {} // constructing with presses must move data
+		XSRData() : screenshot_((XImage*)nullptr), cursor_((XFixesCursorImage*)nullptr), type_(XSRDataType::typing) {}
+		XSRData(XImage *screenshot__, XFixesCursorImage *cursor__, XSRDataType type__) : screenshot_(screenshot__), cursor_(cursor__), type_(type__) {}
+		XSRData(XImage *screenshot__, XFixesCursorImage *cursor__, std::list<XSRPress>&& presses_, XSRDataType type__) : screenshot_(screenshot__), cursor_(cursor__), type_(type__), presses(presses_) {} // constructing with presses must move data
 		friend void swap(XSRData& one, XSRData& two) {
 			using std::swap;
 			swap(one.screenshot_, two.screenshot_);
+			swap(one.cursor_, two.cursor_);
 			swap(one.type_, two.type_);
 			swap(one.presses, two.presses);
 		}

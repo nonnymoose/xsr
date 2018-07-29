@@ -7,17 +7,13 @@
 class xsr_options {
 	public:
 		std::string outfile;
-		bool edit_before_save;
-		bool image_deps;
 		std::string image_ext;
-		bool capture_focused;
 		bool quiet;
 		bool verbose;
 		bool very_verbose;
-		std::string mouse_icon;
-		bool no_mouse;
+		bool include_mouse;
 		int countdown;
-		xsr_options(): outfile("Untitled Recording.html"), edit_before_save(false), image_deps(false), image_ext("png"), capture_focused(false), quiet(false), verbose(false), mouse_icon("/usr/share/xsr/Cursor.png"), no_mouse(false), countdown(5) {}
+		xsr_options(): outfile("Untitled Recording.html"), image_ext("png"), quiet(false), verbose(false), very_verbose(false), include_mouse(true), countdown(5) {}
 };
 extern xsr_options options;
 // global data structure variable containing all of the options

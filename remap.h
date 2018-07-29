@@ -52,6 +52,6 @@ std::map<int, std::string> lookupmouse = {
 	{3, "Right-click"},
 	{4, "Scroll up"},
 	{5, "Scroll down"},
-	{7, "Scroll up"},
-	{6, "Scroll down"} // it's like this on my touchpad. Not sure why though
+	{6, "Scroll left"},
+	{7, "Scroll right"} // e.g. on a touchpad
 };

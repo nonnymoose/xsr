@@ -9,6 +9,7 @@
 #include <condition_variable>
 #include <list>
 #include <X11/extensions/XInput2.h>
+#include <X11/extensions/Xfixes.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/XKBlib.h>
@@ -68,7 +69,7 @@ void setupModifiers(Display *display) {
 
 void sendData(XSRData&& toSend) { // must be moved here!
 	if (! typed_string.empty()) { // if typed_string was sent here then it will be empty!
-		XSRData sendString((XImage*) nullptr, std::move(typed_string), XSRDataType::typing); // create a type instruction with no screenshot if the user performs a different action afterwards
+		XSRData sendString((XImage*) nullptr, (XFixesCursorImage*) nullptr, std::move(typed_string), XSRDataType::typing); // create a type instruction with no screenshot if the user performs a different action afterwards
 		typed_string.clear(); // at least some of the time the list is copied, not moved
 		XSRDataQueueMutex.lock();
 		XSRDataQueue.push(std::move(sendString));
@@ -95,6 +96,15 @@ XImage* takeScreenShot() {
 	// this returns a pointer which MUST be destroyed later using XDestroyImage(XImage*)
 }
 
+XFixesCursorImage* takeMouseShot() {
+	if (options.include_mouse) {
+		return XFixesGetCursorImage(display);
+	}
+	else {
+		return nullptr;
+	}
+}
+
 void* xievent(void *) {
 	display = XOpenDisplay(NULL); // default display
 	
@@ -119,7 +129,7 @@ void* xievent(void *) {
 	
 	bool lastKeyWasModifier = false;
 	bool draggedSincePress = false;
-	short int lastScrollDirection = 0; //-1 for down, 1 for up. Used to prevent consecutive scroll directions in the same direction
+	short int lastScrollDirection = 0; // Used to prevent consecutive scroll directions in the same direction
 	
 	VB std::cerr << '[' << __FILE__ << "] Event collection started" << std::endl;
 	while (! exit_cleanly) {
@@ -201,7 +211,7 @@ void* xievent(void *) {
 							typed_string.emplace_back(key, false);
 							if (key == "Enter" || key == "Return" || key == "Linefeed") {
 								// The user pressed return; this will submit forms and such, so we need to screenshot
-								XSRData thisData(takeScreenShot(), std::move(typed_string), XSRDataType::typing);
+								XSRData thisData(takeScreenShot(), takeMouseShot(), std::move(typed_string), XSRDataType::typing);
 								typed_string.clear(); // again, move is not a guarantee
 								sendData(std::move(thisData));
 							}
@@ -242,31 +252,25 @@ void* xievent(void *) {
 					{
 						// screenshot
 						XImage *thisScreenShot = nullptr;
+						XFixesCursorImage *thisMouseShot = nullptr;
 						draggedSincePress = false;
 						lastKeyWasModifier = false;
 						// ensure that scroll events aren't repeated in the output (that would be awful)
-						if (event->detail == 4 || event->detail == 7) {
-							if (1 == lastScrollDirection) {
-								break;
+						if (event->detail >= 4 && event->detail <= 7) {
+							if (event->detail != lastScrollDirection) {
+								lastScrollDirection = event->detail;
 							}
 							else {
-								lastScrollDirection = 1;
+								break;
 							}
 						}
-						else if (event->detail == 5 || event->detail == 6) {
-							if (-1 == lastScrollDirection) {
-								break;
-							}
-							else {
-								lastScrollDirection = -1;
-							}
-						} // there HAS to be a better way to do that!
 						else {
 							thisScreenShot = takeScreenShot(); // only take a screenshot if we're not scrolling
+							thisMouseShot = takeMouseShot();
 							lastScrollDirection = 0; // not scrolling anymore
 						}
 						VVB std::cerr << '[' << __FILE__ << "] Mouse press: ";
-						XSRData thisData(thisScreenShot, XSRDataType::click);
+						XSRData thisData(thisScreenShot, thisMouseShot, XSRDataType::click);
 						for (auto i: modifierBitMap) {
 							if (event->mods.effective & i.first && i.second != "Num_Lock" && i.second != "Caps_Lock") { // check each modifier bit and print if significant
 								// std::cerr << "<kbd>" << i.second << "</kbd>+";
@@ -299,7 +303,7 @@ void* xievent(void *) {
 							// screenshot
 							// std::cerr << "... and drag.";
 							VVB std::cerr << '[' << __FILE__ << "] Drag" << std::endl;
-							XSRData thisData(takeScreenShot(), XSRDataType::drag);
+							XSRData thisData(takeScreenShot(), takeMouseShot(), XSRDataType::drag);
 							sendData(std::move(thisData));
 						}
 						break;
@@ -310,7 +314,7 @@ void* xievent(void *) {
 			}
 		}
 	}
-	XSRData thisData((XImage*)nullptr, XSRDataType::EXIT); // tell other thread to clean exit
+	XSRData thisData((XImage*)nullptr, (XFixesCursorImage*)nullptr, XSRDataType::EXIT); // tell other thread to clean exit
 	sendData(std::move(thisData));
 	VB std::cerr << '[' << __FILE__ << "] Clean exit" << std::endl;
 	return 0;
