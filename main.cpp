@@ -1,4 +1,6 @@
 #include <iostream>
+#include <ostream>
+#include <fstream>
 #include <atomic>
 // #include <thread>
 #include <pthread.h> // I would use std::thread but there's no support for catching signals
@@ -10,6 +12,8 @@
 #include "html_out.h"
 #include <string>
 #include <X11/extensions/XInput2.h>
+
+std::ostream fout(NULL);
 
 int main(int argc, char** argv) {
 	// process arguments
@@ -24,6 +28,20 @@ int main(int argc, char** argv) {
 	}
 	setup_signal_handler(); // I wonder if we could do signal handling in the main thread?
 	if (options.verbose) std::cerr << '[' << __FILE__ << "] Created signal handler thread" << std::endl;
+	
+	// open file (or stdout)
+	std::streambuf *obuf;
+	std::ofstream fout_file;
+	if (options.outfile == "-") {
+		obuf = std::cout.rdbuf();
+	}
+	else {
+		fout_file = std::ofstream(options.outfile);
+		obuf = fout_file.rdbuf();
+	}
+	fout.rdbuf(obuf);
+	if (options.verbose) std::cerr << '[' << __FILE__ << "] Opened outfile." << std::endl;
+	
 	pthread_t eventHandler;
 	pthread_t htmlHandler;
 	pthread_create(&eventHandler, NULL, xievent, NULL); // spawn the threads that do the work
@@ -32,6 +50,10 @@ int main(int argc, char** argv) {
 	if (options.verbose) std::cerr << '[' << __FILE__ << "] Created thread html_out" << std::endl;
 	pthread_join(eventHandler, nullptr); // wait for threads to exit
 	pthread_join(htmlHandler, nullptr);
+	
+	if (options.outfile != "-") fout_file.close();
+	if (options.verbose) std::cerr << '[' << __FILE__ << "] Closed outfile" << std::endl;
+	if (options.verbose) std::cerr << '[' << __FILE__ << "] Clean exit" << std::endl;
 	if (options.verbose) std::cerr << '[' << __FILE__ << "] Exiting cleanly now." << std::endl;
 	return 0;
 }

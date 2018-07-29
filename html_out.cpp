@@ -20,7 +20,6 @@
 #include "cursor_image.h"
 
 const std::string mimetype = "image/png;base64,"; // if we make other output formats this could be stored differently
-std::ofstream fout;
 
 bool this_thread_exit_cleanly = false; // this thread has its own because it needs to empty the queue first.
 
@@ -42,8 +41,6 @@ void writeScreenshot(XImage* screenshot) {
 }
 
 void* html_out(void *) {
-	fout.open(options.outfile);
-	if (options.verbose) std::cerr << '[' << __FILE__ << "] Opened outfile." << std::endl;
 	fout << XSR_HTML::header << "\n" << XSR_HTML::title() << "\n"; // print out the html header + document title
 	VVB std::cerr << '[' << __FILE__ << "] Wrote header" << std::endl;
 	while (! this_thread_exit_cleanly) {
@@ -118,8 +115,5 @@ void* html_out(void *) {
 	}
 	fout << XSR_HTML::footer;
 	VVB std::cerr << '[' << __FILE__ << "] Wrote footer" << std::endl;
-	fout.close();
-	if (options.verbose) std::cerr << '[' << __FILE__ << "] Closed outfile" << std::endl;
-	if (options.verbose) std::cerr << '[' << __FILE__ << "] Clean exit" << std::endl;
 	return 0;
 }

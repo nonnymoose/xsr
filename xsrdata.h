@@ -61,3 +61,5 @@ extern std::queue<XSRData> XSRDataQueue;
 extern std::mutex XSRDataQueueMutex;
 extern std::condition_variable XSRDataAvailable;
 extern bool XSRDataAvailableBoolean;
+
+extern std::ostream fout;

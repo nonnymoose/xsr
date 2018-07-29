@@ -48,6 +48,11 @@ bool parse_arguments (int argc, char** argv) {
 		switch (option) {
 			case 'o':
 				options.outfile = optarg;
+				if (options.outfile == "-") {
+					options.quiet = true;
+					options.verbose = false;
+					options.very_verbose = false;
+				}
 				break;
 			//
 			case 'c':
@@ -57,6 +62,7 @@ bool parse_arguments (int argc, char** argv) {
 			case 'q':
 				options.quiet = true;
 				options.verbose = false;
+				options.very_verbose = false;
 				break;
 			//
 			case '?':
