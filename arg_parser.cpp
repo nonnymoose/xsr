@@ -17,7 +17,7 @@ where options are:\n\n\
  --verbose|-v			Print detailed information to stdout or stderr\n\
  --very-verbose|-vv		Print even more detailed information, \n\
  				including about individual events!\n\
- --countdown sec			Wait sec seconds before beginning to record.\n\
+ --countdown sec		Wait sec seconds before beginning to record.\n\
  				Default 5\n\
  --no-countdown			Do not wait before beginning to record.\n\
  --mouse|-m			Include the mouse cursor in the screenshot (default)\n\

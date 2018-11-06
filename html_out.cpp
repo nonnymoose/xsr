@@ -100,6 +100,10 @@ void* html_out(void *) {
 					// std::cerr << "PROBLEM";
 					break;
 			}
+			if (thisData.windowTitle().length() > 0) {
+				fout << XSR_HTML::tags::app_start << thisData.windowTitle() << XSR_HTML::tags::app_end;
+				VVB std::cerr << '[' << __FILE__ << "] Wrote app title " << thisData.windowTitle() << std::endl;
+			}
 			fout << XSR_HTML::tags::div_end << "\n";
 			if (thisData.screenshot() != nullptr) {
 				if (thisData.cursor() != nullptr) {

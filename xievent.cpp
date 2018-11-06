@@ -17,6 +17,7 @@
 #include "arg_parser.h"
 #include "xsrdata.h"
 #include "xievent.h"
+#include "window_info.h"
 
 std::set<KeyCode> modifierKeyCodes; // for checking if a key is a modifier
 std::map<int, std::string> modifierBitMap; // map individual modifiers to their descriptions
@@ -69,7 +70,7 @@ void setupModifiers(Display *display) {
 
 void sendData(XSRData&& toSend) { // must be moved here!
 	if (! typed_string.empty()) { // if typed_string was sent here then it will be empty!
-		XSRData sendString((XImage*) nullptr, (XFixesCursorImage*) nullptr, std::move(typed_string), XSRDataType::typing); // create a type instruction with no screenshot if the user performs a different action afterwards
+		XSRData sendString((XImage*) nullptr, (XFixesCursorImage*) nullptr, "", std::move(typed_string), XSRDataType::typing); // create a type instruction with no screenshot if the user performs a different action afterwards
 		typed_string.clear(); // at least some of the time the list is copied, not moved
 		XSRDataQueueMutex.lock();
 		XSRDataQueue.push(std::move(sendString));
@@ -211,7 +212,7 @@ void* xievent(void *) {
 							typed_string.emplace_back(key, false);
 							if (key == "Enter" || key == "Return" || key == "Linefeed") {
 								// The user pressed return; this will submit forms and such, so we need to screenshot
-								XSRData thisData(takeScreenShot(), takeMouseShot(), std::move(typed_string), XSRDataType::typing);
+								XSRData thisData(takeScreenShot(), takeMouseShot(), getActiveWindowTitle(display), std::move(typed_string), XSRDataType::typing);
 								typed_string.clear(); // again, move is not a guarantee
 								sendData(std::move(thisData));
 							}
@@ -270,7 +271,7 @@ void* xievent(void *) {
 							lastScrollDirection = 0; // not scrolling anymore
 						}
 						VVB std::cerr << '[' << __FILE__ << "] Mouse press: ";
-						XSRData thisData(thisScreenShot, thisMouseShot, XSRDataType::click);
+						XSRData thisData(thisScreenShot, thisMouseShot, getActiveWindowTitle(display), XSRDataType::click);
 						for (auto i: modifierBitMap) {
 							if (event->mods.effective & i.first && i.second != "Num_Lock" && i.second != "Caps_Lock") { // check each modifier bit and print if significant
 								// std::cerr << "<kbd>" << i.second << "</kbd>+";
@@ -303,7 +304,7 @@ void* xievent(void *) {
 							// screenshot
 							// std::cerr << "... and drag.";
 							VVB std::cerr << '[' << __FILE__ << "] Drag" << std::endl;
-							XSRData thisData(takeScreenShot(), takeMouseShot(), XSRDataType::drag);
+							XSRData thisData(takeScreenShot(), takeMouseShot(), getActiveWindowTitle(display), XSRDataType::drag);
 							sendData(std::move(thisData));
 						}
 						break;
@@ -314,7 +315,7 @@ void* xievent(void *) {
 			}
 		}
 	}
-	XSRData thisData((XImage*)nullptr, (XFixesCursorImage*)nullptr, XSRDataType::EXIT); // tell other thread to clean exit
+	XSRData thisData((XImage*)nullptr, (XFixesCursorImage*)nullptr, "", XSRDataType::EXIT); // tell other thread to clean exit
 	sendData(std::move(thisData));
 	VB std::cerr << '[' << __FILE__ << "] Clean exit" << std::endl;
 	return 0;

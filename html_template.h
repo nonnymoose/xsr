@@ -22,5 +22,7 @@ namespace XSR_HTML {
 		const std::string div_end = "</div>";
 		const std::string img_start = "<img src=\"data:";
 		const std::string img_end = "\" />";
+		const std::string app_start = " in <apptitle>";
+		const std::string app_end = "</apptitle>";
 	}
 }

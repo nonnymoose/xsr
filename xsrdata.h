@@ -26,6 +26,7 @@ class XSRData {
 	private:
 		XImage *screenshot_;
 		XFixesCursorImage *cursor_;
+		std::string windowTitle_;
 		XSRDataType type_;
 	public:
 		XImage* screenshot() {
@@ -37,16 +38,20 @@ class XSRData {
 		XSRDataType type() {
 			return type_;
 		}
+		std::string windowTitle() {
+			return windowTitle_;
+		}
 		std::list<XSRPress> presses;
-		XSRData() : screenshot_((XImage*)nullptr), cursor_((XFixesCursorImage*)nullptr), type_(XSRDataType::typing) {}
-		XSRData(XImage *screenshot__, XFixesCursorImage *cursor__, XSRDataType type__) : screenshot_(screenshot__), cursor_(cursor__), type_(type__) {}
-		XSRData(XImage *screenshot__, XFixesCursorImage *cursor__, std::list<XSRPress>&& presses_, XSRDataType type__) : screenshot_(screenshot__), cursor_(cursor__), type_(type__), presses(presses_) {} // constructing with presses must move data
+		XSRData() : screenshot_((XImage*)nullptr), cursor_((XFixesCursorImage*)nullptr), windowTitle_(""), type_(XSRDataType::typing) {}
+		XSRData(XImage *screenshot__, XFixesCursorImage *cursor__, std::string windowTitle, XSRDataType type__) : screenshot_(screenshot__), cursor_(cursor__), windowTitle_(windowTitle), type_(type__) {}
+		XSRData(XImage *screenshot__, XFixesCursorImage *cursor__, std::string windowTitle, std::list<XSRPress>&& presses_, XSRDataType type__) : screenshot_(screenshot__), cursor_(cursor__), windowTitle_(windowTitle), type_(type__), presses(presses_) {} // constructing with presses must move data
 		friend void swap(XSRData& one, XSRData& two) {
 			using std::swap;
 			swap(one.screenshot_, two.screenshot_);
 			swap(one.cursor_, two.cursor_);
 			swap(one.type_, two.type_);
 			swap(one.presses, two.presses);
+			swap(one.windowTitle_, two.windowTitle_);
 		}
 		XSRData& operator=(XSRData other) {
 			swap(*this, other);

@@ -10,7 +10,7 @@ CXXFLAGS = -Wall -Wextra -pedantic --std=c++14
 LDFLAGS = -pthread
 CXXFLAGS += -pthread # this IS necessary; see pthreads(7), Compiling on Linux
 LDLIBS = -lX11 -lXi -lpng16 -lz -lXfixes
-OBJECTS = arg_parser.o html_out.o to_png.o main.o signal_handler.o xievent.o base64.o cursor_image.o
+OBJECTS = arg_parser.o html_out.o to_png.o main.o signal_handler.o xievent.o base64.o cursor_image.o window_info.o
 
 ifeq ($(strip $(DEBUG)),true)
 CXXFLAGS += -g
