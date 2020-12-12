@@ -21,7 +21,7 @@ Make sure you have `scrot` (direct screenshot), `maim` (screenshot with selectio
 
 I recommend that you have `xdotool` (mouse position) and `imagemagick` (to add pointer to screenshots) installed as well.
 
-If you want to use the bash script `xsr.sh`, edit it and update the default file names zone.
+If you want to use the bash script `xsr.sh`, install `zenity` (dialog box) and `pandoc` (convert from HTML to md) then edit it and update the default file names zone.
 
 For `xsr.desktop`, change keys `Exec`, `Icon` and `Path`.
 
