@@ -1,0 +1,16 @@
+in=in
+type=Type
+notitle=No title
+drag=... and drag
+step=Step
+slinactif=One second wait inactive
+slactif=One second wait active
+pauseactif=Press 'Pause' again to continue recording ...
+pauseinactif=Record continue
+startstillhere=Start to record.
+startingin=Starting in
+pressreturn=Press return when finished.
+pressscrolllock=Press 'Scroll Lock' to add one seconde wait before screenshot
+pressshiftscrolllock=Press 'Shift + Scroll Lock' to add a step inside recording
+presspause=Press 'Pause' to stop recording
+pressshiftpause=Press 'Shift + Pause' to quit recording

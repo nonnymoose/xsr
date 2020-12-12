@@ -1,0 +1,16 @@
+in=dans
+type=Saisir
+notitle=Pas de titre
+drag=... et d&eacute;placer
+step=Etape
+slinactif=Delai d'une seconde inactif
+slactif=Delai d'une seconde actif
+pauseactif=Appuyer de nouveau sur 'Pause' pour en sortir ...
+pauseinactif=Fin de la pause
+startstillhere=Pret. Vous pouvez enregistrer.
+startingin=Commence dans
+pressreturn=Appuyer sur Entree pour terminer
+pressscrolllock=Appuyer sur 'Arret defil' pour ajouter une pause d'une seconde avant la copie d'ecran
+pressshiftscrolllock=Appuyer sur 'Shift + Arret defil' pour ajouter une etape dans l\'enregistrement
+presspause=Appuyer sur 'Pause' pour stopper l'enregistrement
+pressshiftpause=Appuyer sur 'Shift + Pause' pour quitter l'enregistrement
