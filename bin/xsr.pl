@@ -48,7 +48,7 @@ my $islegend = 0;
 my $ispaused = 0;
 my $finalreturn = 0;
 my $withwatermark = 0;
-my $watermarkfile = undef;
+my $watermarkfile = "$parentscriptdir/icons/logo.png";
 my %mimetypes = (
 	"png", "image/png",
 	"jpg", "image/jpeg",
@@ -83,8 +83,8 @@ GetOptions (
 	"countdown:i" => \$countdown,
 	"no-countdown" => sub {$countdown = 0},
 	"no-mouse" => \$nomouse,
-	"help|h" => sub {print(STDOUT xsr::Functions::usage($outfile, $lang, $countdown, $imageEditor, $imgext, $cursor, $htmleditor, $css, $fileexplorer, $screenshotmode)); exit(0);}
-	) or die("[ERROR] $!\n" . xsr::Functions::usage($outfile, $lang, $countdown, $imageEditor, $imgext, $cursor, $htmleditor, $css, $fileexplorer, $screenshotmode));
+	"help|h" => sub {print(STDOUT xsr::Functions::usage($outfile, $lang, $countdown, $imageEditor, $imgext, $cursor, $htmleditor, $css, $fileexplorer, $screenshotmode, $watermarkfile)); exit(0);}
+	) or die("[ERROR] $!\n" . xsr::Functions::usage($outfile, $lang, $countdown, $imageEditor, $imgext, $cursor, $htmleditor, $css, $fileexplorer, $screenshotmode, $watermarkfile));
 
 my $realcharsfile = "$parentscriptdir/langs/$lang/realchars.props";
 my $translatefile = "$parentscriptdir/langs/$lang/translate.props";
@@ -97,11 +97,11 @@ if (@ARGV == 1) {
 }
 elsif (@ARGV == 0) {
 	#fine.
-    #print(STDOUT xsr::Functions::usage($outfile, $lang, $countdown, $imageEditor, $imgext, $cursor, $htmleditor, $css, $fileexplorer, $screenshotmode));
+    #print(STDOUT xsr::Functions::usage($outfile, $lang, $countdown, $imageEditor, $imgext, $cursor, $htmleditor, $css, $fileexplorer, $screenshotmode, $watermarkfile));
 	warn("[WARN] Default HTML file $outfile used\n");
 }
 else {
-	print(STDOUT xsr::Functions::usage($outfile, $lang, $countdown, $imageEditor, $imgext, $cursor, $htmleditor, $css, $fileexplorer, $screenshotmode));
+	print(STDOUT xsr::Functions::usage($outfile, $lang, $countdown, $imageEditor, $imgext, $cursor, $htmleditor, $css, $fileexplorer, $screenshotmode, $watermarkfile));
 	die("[ERROR] Too many arguments.\n");
 }
 
