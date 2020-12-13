@@ -14,3 +14,4 @@ pressscrolllock=Press 'Scroll Lock' to add one seconde wait before screenshot
 pressshiftscrolllock=Press 'Shift + Scroll Lock' to add a step inside recording
 presspause=Press 'Pause' to stop recording
 pressshiftpause=Press 'Shift + Pause' to quit recording
+errorss=No screenshot possible, install 'scrot' and 'maim'

@@ -45,6 +45,7 @@ my $viewrecord = 0;
 my $fileexplorer = "xdg-open"; # dolphin
 my $isdelayed = 0;
 my $islegend = 0;
+my $istypingsaved = 0;
 my $ispaused = 0;
 my $finalreturn = 0;
 my $withwatermark = 0;
@@ -76,6 +77,7 @@ GetOptions (
 	"quiet|q" => \$quiet,
 	"need-final-return|z" => \$finalreturn,
 	"legend|g" => \$islegend,
+	"save-typing|y" => \$istypingsaved,
 	"mouse-icon|cursor=s" => \$cursor,
 	"watermark|w=s" => \$watermarkfile,
 	"add-watermark|a" => \$withwatermark,
@@ -116,6 +118,7 @@ my ($outfilename, $outfilename_noext, $outfiledir) = xsr::Functions::getoutfilei
 my $mimetype = xsr::Functions::getmimetype(\%mimetypes, $imgext);
 
 my $scrot = xsr::Functions::getexternaltool("scrot", "cannot take screenshots");
+my $maim = xsr::Functions::getexternaltool("maim", "cannot take select screenshots");
 
 # check for features, warn and do not use if unavailable
 # only check if mouse will be used for first two
@@ -419,7 +422,7 @@ MAINLOOP: while (<$XIN>) {
 			if ($k{$d} =~ /Return|Enter/i) {
                 print(STDOUT "\n") if $typing && not $quiet;
                 #print(STDOUT "1: $XIN\n");
-				(my $shotnumber, $screeni, my $ref_windowgrabs, my $ref_mousegrabs, $istakescreenshot) = xsr::Functions::takescreenshot(\%translate, $xdotool, $composite, $nomouse, \@windowgrabs, \@mousegrabs, $isdelayed, $screenshotmode, $imgext, $quiet, $screeni);
+				(my $shotnumber, $screeni, my $ref_windowgrabs, my $ref_mousegrabs, $istakescreenshot) = xsr::Functions::takescreenshot(\%translate, $xdotool, $composite, $nomouse, \@windowgrabs, \@mousegrabs, $isdelayed, $screenshotmode, $imgext, $quiet, $screeni, $maim, $scrot);
 
                 @windowgrabs = @{$ref_windowgrabs};
                 @mousegrabs = @{$ref_mousegrabs};
@@ -447,7 +450,7 @@ MAINLOOP: while (<$XIN>) {
 			$movedsince = 0; # haven't moved yet since this button press
 			my $mousebutton = xsr::Functions::getrealbutton($d, \%realbuttons);
 			unless ($d == $lastscroll || $mousebutton =~ /scroll/i) { # only do printing and stuff if this is not a second or later scroll event
-                (my $shotnumber, $screeni, my $ref_windowgrabs, my $ref_mousegrabs, $istakescreenshot) = xsr::Functions::takescreenshot(\%translate, $xdotool, $composite, $nomouse, \@windowgrabs, \@mousegrabs, $isdelayed, $screenshotmode, $imgext, $quiet, $screeni);
+                (my $shotnumber, $screeni, my $ref_windowgrabs, my $ref_mousegrabs, $istakescreenshot) = xsr::Functions::takescreenshot(\%translate, $xdotool, $composite, $nomouse, \@windowgrabs, \@mousegrabs, $isdelayed, $screenshotmode, $imgext, $quiet, $screeni, $maim, $scrot);
 
                 @windowgrabs = @{$ref_windowgrabs};
                 @mousegrabs = @{$ref_mousegrabs};
@@ -499,7 +502,7 @@ MAINLOOP: while (<$XIN>) {
 			$typing = xsr::Functions::handletypingstate($FOUT, $typing, $quiet, $mytypingtext);
 			if (gettimeofday() - $buttondown >= .075 && $movedsince) { # if we have moved the mouse since clicking and it's been more than 0.075 seconds, recognize it as a click and drag
 																																 # This is very similar to the system default
-				(my $shotnumber, $screeni, my $ref_windowgrabs, my $ref_mousegrabs, $istakescreenshot) = xsr::Functions::takescreenshot(\%translate, $xdotool, $composite, $nomouse, \@windowgrabs, \@mousegrabs, $isdelayed, $screenshotmode, $imgext, $quiet, $screeni);
+				(my $shotnumber, $screeni, my $ref_windowgrabs, my $ref_mousegrabs, $istakescreenshot) = xsr::Functions::takescreenshot(\%translate, $xdotool, $composite, $nomouse, \@windowgrabs, \@mousegrabs, $isdelayed, $screenshotmode, $imgext, $quiet, $screeni, $maim, $scrot);
 
                 @windowgrabs = @{$ref_windowgrabs};
                 @mousegrabs = @{$ref_mousegrabs};

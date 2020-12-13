@@ -15,6 +15,54 @@ use Config::Properties;
 my $properties = Config::Properties->new();
 my $fh;
 
+# usage
+sub usage {
+    my ($outfile, $lang, $countdown, $imageEditor, $imgext, $cursor, $htmleditor, $css, $fileexplorer, $screenshotmode, $watermarkfile) = @_;
+	return <<endusage;
+Description:
+   $0 is a clone of PSR for Windows, a program that allows users to make a recording of all of the steps they took. It's like a screen recorder that doesn't record a video.
+   It records your keystrokes too (!), and it saves the output as standard html (base64-uri-encoded images). This allows for easy editing of the resultant file, such as to remove passwords you typed.
+
+Usage:
+    $0 [options] outfile
+
+Options:
+
+  General:
+  -o|--out outfile		Output file name with absolute path (also can be first argument) (default: $outfile)
+  -l|--lang=code		Language for HTML page (en or fr) (default: $lang)
+  -q|--quiet			Suppress output to STDOUT
+  -y|--save-typing		Save typing keys
+  -z|--need-final-return	Need to press Return at the end of script
+  --countdown[=seconds]		Display countdown (default: $countdown)
+  --no-countdown		Don't display countdown
+  -h|--help			Print this message
+
+  Images:
+  -p|--images-absolute-path	Images absolute path into HTML
+  -e|--edit-images-before-save	Edit images before saving file
+  -i|--images-editor=file	Images editor (default: $imageEditor)
+  -d|--image-deps		Do not convert images to base64; instead, output the dependent file and it's resources directory
+  -c|--image-extension=ext	Extension of image output (png or jpg) (default: $imgext)
+  -u|--screenshot-mode		Screenshot mode : all (all the desktop), select (a selection) or focus (the focused window) (default: $screenshotmode)
+  --mouse-icon|--cursor=file	Specify cursor image (default: $cursor)
+  --no-mouse			Do not add mouse to screenshots
+  -w|--watermark=file	Specify watermark image (default: $watermarkfile)
+  -a|--add-watermark			Add watermark to screenshots
+
+  HTML:
+  -s|--edit-html		Edit HTML
+  -t|--html-editor=file		HTML editor (default: $htmleditor)
+  --css=file			Specify CSS file (default: $css)
+  -g|--legend			Put text above image
+
+  Explore:
+  -r|--view-record		Show recorded HTML directory
+  -f|--file-explorer=file	File explorer (default: $fileexplorer)
+
+endusage
+}
+
 sub begincountdown {
     my ($countdown, $ref_translate) = @_;
 	my %translate = %{$ref_translate};
@@ -100,53 +148,6 @@ sub loadpropertiesfile {
     open($fh, '<', $file) or die "unable to open configuration file $file";
     $properties->load($fh);
     return $properties->properties;
-}
-
-# usage
-sub usage {
-    my ($outfile, $lang, $countdown, $imageEditor, $imgext, $cursor, $htmleditor, $css, $fileexplorer, $screenshotmode, $watermarkfile) = @_;
-	return <<endusage;
-Description:
-   $0 is a clone of PSR for Windows, a program that allows users to make a recording of all of the steps they took. It's like a screen recorder that doesn't record a video.
-   It records your keystrokes too (!), and it saves the output as standard html (base64-uri-encoded images). This allows for easy editing of the resultant file, such as to remove passwords you typed.
-
-Usage:
-    $0 [options] outfile
-
-Options:
-
-  General:
-  -o|--out outfile		Output file name with absolute path (also can be first argument) (default: $outfile)
-  -l|--lang=code		Language for HTML page (en or fr) (default: $lang)
-  -q|--quiet			Suppress output to STDOUT
-  -z|--need-final-return	Need to press Return at the end of script
-  --countdown[=seconds]		Display countdown (default: $countdown)
-  --no-countdown		Don't display countdown
-  -h|--help			Print this message
-
-  Images:
-  -p|--images-absolute-path	Images absolute path into HTML
-  -e|--edit-images-before-save	Edit images before saving file
-  -i|--images-editor=file	Images editor (default: $imageEditor)
-  -d|--image-deps		Do not convert images to base64; instead, output the dependent file and it's resources directory
-  -c|--image-extension=ext	Extension of image output (png or jpg) (default: $imgext)
-  -u|--screenshot-mode		Screenshot mode : all (all the desktop), select (a selection) or focus (the focused window) (default: $screenshotmode)
-  --mouse-icon|--cursor=file	Specify cursor image (default: $cursor)
-  --no-mouse			Do not add mouse to screenshots
-  -w|--watermark=file	Specify watermark image (default: $watermarkfile)
-  -a|--add-watermark			Add watermark to screenshots
-
-  HTML:
-  -s|--edit-html		Edit HTML
-  -t|--html-editor=file		HTML editor (default: $htmleditor)
-  --css=file			Specify CSS file (default: $css)
-  -g|--legend			Put text above image
-
-  Explore:
-  -r|--view-record		Show recorded HTML directory
-  -f|--file-explorer=file	File explorer (default: $fileexplorer)
-
-endusage
 }
 
 sub getmimetype {
@@ -338,7 +339,7 @@ sub handletypingstate {
 }
 
 sub takescreenshot {
-	my ($ref_translate, $xdotool, $composite, $nomouse, $ref_windowgrabs, $ref_mousegrabs, $isdelayed, $screenshotmode, $imgext, $quiet, $screeni) = @_;
+	my ($ref_translate, $xdotool, $composite, $nomouse, $ref_windowgrabs, $ref_mousegrabs, $isdelayed, $screenshotmode, $imgext, $quiet, $screeni, $maim, $scrot) = @_;
 	my %translate = %{$ref_translate};
 	my @windowgrabs = @{$ref_windowgrabs};
 	my @mousegrabs = @{$ref_mousegrabs};
@@ -374,12 +375,18 @@ sub takescreenshot {
 	}
 	# Image name completed with zeroes to get them with right order when editing
 	my $imgname = imagename($screeni);
-	my $systemoutput;
-	if ($screenshotmode eq "select") {
+	my $systemoutput = 1;
+	if ($maim && $screenshotmode eq "select") {
         $systemoutput = system("maim --hidecursor --select $imgname.$imgext 1>/dev/null 2>/dev/null");
 	}
 	else {
-        $systemoutput = system("scrot".( $screenshotmode eq "focus" ? " --focused" : "" )." $imgname.$imgext");
+        if ($scrot) {
+            $systemoutput = system("scrot".( $screenshotmode eq "focus" ? " --focused" : "" )." $imgname.$imgext");
+        }
+        else {
+            my $errorss = $translate{"errorss"};
+            warn("[XWARN] $errorss\n");
+        }
     }
 
 	if ($systemoutput eq 0) {

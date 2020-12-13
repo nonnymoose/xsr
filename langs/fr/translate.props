@@ -14,3 +14,4 @@ pressscrolllock=Appuyer sur 'Arret defil' pour ajouter une pause d'une seconde a
 pressshiftscrolllock=Appuyer sur 'Shift + Arret defil' pour ajouter une etape dans l\'enregistrement
 presspause=Appuyer sur 'Pause' pour stopper l'enregistrement
 pressshiftpause=Appuyer sur 'Shift + Pause' pour quitter l'enregistrement
+errorss=Pas de copie d'ecran possible, installer 'scrot' et 'maim'
