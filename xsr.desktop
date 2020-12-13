@@ -2,15 +2,15 @@
 Categories=Script;Automatisation;Step;Recorder;
 Comment[fr_FR]=Capture d'écran automatique
 Comment=Automatic Screen and Keyboard Recorder
-Exec=konsole --new-tab -p LocalTabTitleFormat="X Steps Recorder" -p Icon="/home/olivier/Logiciels/xsr/icons/logo.png" -e /home/olivier/Logiciels/xsr/xsr.sh
+Exec=konsole --new-tab -p LocalTabTitleFormat="X Steps Recorder" -p Icon="/path/to/the/application/xsr/icons/logo.png" -e /path/to/the/application/xsr/xsr.sh
 GenericName[fr_FR]=Capture d'écran automatique
 GenericName=Automatic Screen and Keyboard Recorder
-Icon=/home/olivier/Logiciels/xsr/icons/logo.png
+Icon=/path/to/the/application/xsr/icons/logo.png
 Keywords=Script;Automatisation;Step;Recorder;
 #MimeType=
 Name[fr_FR]=X Steps Recorder
 Name=X Steps Recorder
-Path=/home/olivier/Logiciels/xsr
+Path=/path/to/the/application/xsr
 StartupNotify=true
 StartupWMClass=xsr
 Terminal=false
