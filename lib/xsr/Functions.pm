@@ -6,6 +6,7 @@ package xsr::Functions;
 use Cwd qw(cwd abs_path);
 use File::Basename;
 use File::Copy qw(copy);
+use File::Path qw(remove_tree);
 use strict;
 use Config::Properties;
 
@@ -103,7 +104,7 @@ sub loadpropertiesfile {
 
 # usage
 sub usage {
-    my ($outfile, $lang, $countdown, $imageEditor, $imgext, $cursor, $htmleditor, $css, $fileexplorer, $screenshotmode) = @_;
+    my ($outfile, $lang, $countdown, $imageEditor, $imgext, $cursor, $htmleditor, $css, $fileexplorer, $screenshotmode, $watermarkfile) = @_;
 	return <<endusage;
 Description:
    $0 is a clone of PSR for Windows, a program that allows users to make a recording of all of the steps they took. It's like a screen recorder that doesn't record a video.
@@ -132,7 +133,7 @@ Options:
   -u|--screenshot-mode		Screenshot mode : all (all the desktop), select (a selection) or focus (the focused window) (default: $screenshotmode)
   --mouse-icon|--cursor=file	Specify cursor image (default: $cursor)
   --no-mouse			Do not add mouse to screenshots
-  -w|--watermark=file	Specify watermark image (default: none)
+  -w|--watermark=file	Specify watermark image (default: $watermarkfile)
   -a|--add-watermark			Add watermark to screenshots
 
   HTML:
@@ -496,8 +497,14 @@ sub copyimagetodest {
     my ($outfiledir, $imagedeps, $outfilename_noext, $screeni, $tmpdir, $imgext, $withwatermark, $watermarkfile) = @_;
 
     chdir($outfiledir);
+
     if ($imagedeps) {
         my $destdirimage = "$outfilename_noext";
+
+        if (-d $destdirimage) {
+            # remove image destination to avoid junk data
+            remove_tree $destdirimage or warn("[WARN] Unable to remove image destination directory; junk remains in $destdirimage");
+        }
         mkdir($destdirimage);
 
         # copy all image files to the dependent directory
