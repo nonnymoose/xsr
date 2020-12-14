@@ -1,4 +1,4 @@
-Welcome to [XSR Logo](../icons/logo.png)
+Welcome to ![XSR Logo](../icons/logo.png)
 
 ## Installation
 
