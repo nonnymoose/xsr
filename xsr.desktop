@@ -1,0 +1,24 @@
+[Desktop Entry]
+Categories=Script;Automatisation;Step;Recorder;
+Comment[fr_FR]=Capture d'écran automatique
+Comment=Automatic Screen and Keyboard Recorder
+Exec=konsole --new-tab -p LocalTabTitleFormat="X Steps Recorder" -p Icon="/path/to/the/application/xsr/icons/logo.png" -e /path/to/the/application/xsr/xsr.sh
+GenericName[fr_FR]=Capture d'écran automatique
+GenericName=Automatic Screen and Keyboard Recorder
+Icon=/path/to/the/application/xsr/icons/logo.png
+Keywords=Script;Automatisation;Step;Recorder;
+#MimeType=
+Name[fr_FR]=X Steps Recorder
+Name=X Steps Recorder
+Path=/path/to/the/application/xsr
+StartupNotify=true
+StartupWMClass=xsr
+Terminal=false
+TerminalOptions=
+Type=Application
+Version=1.0
+WM_CLASS=xsr
+X-DBUS-ServiceName=
+X-DBUS-StartupType=
+X-KDE-SubstituteUID=false
+X-KDE-Username=
