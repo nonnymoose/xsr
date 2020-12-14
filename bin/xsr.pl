@@ -7,8 +7,6 @@ use Cwd qw(cwd abs_path);
 use File::Copy qw(copy);
 use File::Path qw(remove_tree);
 use File::Basename;
-use HTML::Entities qw(encode_entities);
-use Encode qw(encode decode);
 use MIME::Base64 qw(encode_base64); # internal Base64 (see #41)
 use strict;
 use warnings;
@@ -21,7 +19,7 @@ use lib::relative "../lib";
 
 use xsr::Functions;
 
-my $istakescreenshot = 0;
+my $istookscreenshot = 0;
 my $lang = "en"; # "fr"
 my $outfile = "$parentscriptdir/html/Untitled Recording.html";
 my $FOUT; # output filehandle
@@ -45,7 +43,7 @@ my $viewrecord = 0;
 my $fileexplorer = "xdg-open"; # dolphin
 my $isdelayed = 0;
 my $islegend = 0;
-my $istypingsaved = 0;
+my $istypedsaved = 0;
 my $ispaused = 0;
 my $finalreturn = 0;
 my $withwatermark = 0;
@@ -77,7 +75,7 @@ GetOptions (
 	"quiet|q" => \$quiet,
 	"need-final-return|z" => \$finalreturn,
 	"legend|g" => \$islegend,
-	"save-typing|y" => \$istypingsaved,
+	"save-typing|y" => \$istypedsaved,
 	"mouse-icon|cursor=s" => \$cursor,
 	"watermark|w=s" => \$watermarkfile,
 	"add-watermark|a" => \$withwatermark,
@@ -153,7 +151,7 @@ my %realbuttons = xsr::Functions::loadpropertiesfile($realbuttonsfile); # realbu
 $realbuttons{"0"} = undef;
 my %modifiers = xsr::Functions::loadpropertiesfile($modifiersfile); # modifiers
 
-xsr::Functions::showinstructions(\%translate);
+xsr::Functions::showinstructions(\%translate, $istypedsaved);
 
 xsr::Functions::begincountdown($countdown, \%translate);
 
@@ -184,13 +182,8 @@ sub finish {
 	print(STDOUT "\n") if not $quiet;
 	if ($FOUT) {
 		$typing = xsr::Functions::handletypingstate($FOUT, $typing, $quiet, $mytypingtext);
-		print $FOUT <<"/html";
-		<div class="footer">
-			<i>Made using <a href="https://github.com/olivierlab/xsr">X Steps Recorder</a>.</i>
-		</div>
-	</body>
-</html>
-/html
+
+        xsr::Functions::addfooter($FOUT);
 
 		$FOUT->flush();
 		close($FOUT);
@@ -231,22 +224,16 @@ sub finish {
 	exit();
 }
 
+# ==============================================================
+#                       MAIN PROCESS
+# ==============================================================
+
 # open output file (NOTE: no safety here! Watch out!)
 open($FOUT, ">", "tmpassoconly.html") or warn("[WARN] Could not open temporary output file");
 
 # print header
 my $mycsscontents = xsr::Functions::readfileintovar($css);
-print $FOUT <<"/html";
-<!DOCTYPE html>
-<html>
-	<head>
-		<title>$outfilename_noext</title>
-    <meta charset="UTF-8" />
-	</head>
-	<body>
-        <style>$mycsscontents</style>
-		<h1>$outfilename_noext</h1>
-/html
+xsr::Functions::addheader($FOUT, $outfilename_noext, $mycsscontents);
 
 # execute xinput with the monitoring options
 open($XIN, "-|", "xinput --test-xi2 --root") or die("[ERROR] Unable to watch for X input events");
@@ -273,15 +260,21 @@ my $movedsince;
 my $lastscroll = 0;
 my $buttondown = gettimeofday();
 my $valstep = 1;
-my $fuck = gettimeofday(); # store time of buttonpress
+my $previouslooptime = gettimeofday();
+
 MAINLOOP: while (<$XIN>) {
-    if ($istakescreenshot) {
-        if (gettimeofday() - $fuck >= .075) {
-            $istakescreenshot = 0;
+    # Purge buffered input during select screenshot.
+    # During select screenshot, mouse move buffered a lot of input.
+    # We need to empty it before continuing
+    if ($istookscreenshot) {
+        # The buffer is empty when time delta is high so we can quit the loop
+        if (gettimeofday() - $previouslooptime >= .075) {
+            $istookscreenshot = 0;
         }
-        $fuck = gettimeofday(); # store time of buttonpress
+        $previouslooptime = gettimeofday(); # store current time
         next;
     }
+
 	if (/^EVENT type.*\((.*)\)/) {
         $e = $1; # store event type in $e
     }
@@ -296,8 +289,16 @@ MAINLOOP: while (<$XIN>) {
         # ------------------------------------------------------------
 		if ($e =~ /^KeyPress/) { # handle typing
 			$lastscroll = 0; # definitely not scrolling anymore
-			my $key = xsr::Functions::getrealchar($k{$d}, \%realchars); # get machine-readable name from detail, then get human-readable name from that
-			#print(STDOUT "[DEBUG] $key\n");
+
+			my $rawkey = $k{$d};
+			#print(STDOUT "[DEBUG] $rawkey\n");
+
+			if ((not $istypedsaved) && ($rawkey =~ /space/i)) {
+                xsr::Functions::printinfotranlated("addtextblock", \%translate);
+                xsr::Functions::printtitle($FOUT, $translate{"mytext"});
+                next:
+                #xsr::Functions::printinfotranlated("slactif", \%translate);
+			}
 
 			# ------------------------------------------------------
 			# get modifiers
@@ -311,21 +312,21 @@ MAINLOOP: while (<$XIN>) {
 					# this loop goes through all modifiers and checks if their bit is set
 					if ($m[$_] =~ /iso_level3/i) { # if AltGr is pressed
 						if (xsr::Functions::getrealchar($Ka{$d}, \%realchars) ne "NoSymbol") {
-                            $key = $alt{$Ka{$d}}; # get its third level, if there is one
+                            $rawkey = $alt{$Ka{$d}}; # get its third level, if there is one
 						}
 						else {
 							push(@mods, $m[$_]); # otherwise DO add shift to modifier list
 						}
 					}
 					elsif ($k{$d} =~ /^KP_/i && $m[$_] =~ /num.*lock/i) { # if it's a keypad key and num lock is on
-						$key = xsr::Functions::getrealchar($K{$d}, \%realchars) unless xsr::Functions::getrealchar($K{$d}, \%realchars) eq "NoSymbol"; # get its second level (if there is one)
+						$rawkey = xsr::Functions::getrealchar($K{$d}, \%realchars) unless xsr::Functions::getrealchar($K{$d}, \%realchars) eq "NoSymbol"; # get its second level (if there is one)
 					}
 					elsif ($m[$_] =~ /num.*lock/i) {
 						# do nothing, num lock should not appear in the modifier array
 					}
 					elsif ($m[$_] =~ /shift/i) { # if shift is pressed for uppercase letters
 						if (xsr::Functions::getrealchar($K{$d}, \%realchars) ne "NoSymbol") {
-							$key = xsr::Functions::getrealchar($K{$d}, \%realchars); # get its second level, if there is one
+							$rawkey = xsr::Functions::getrealchar($K{$d}, \%realchars); # get its second level, if there is one
 						}
 						else {
 							push(@mods, $m[$_]); # otherwise DO add shift to modifier list
@@ -342,12 +343,12 @@ MAINLOOP: while (<$XIN>) {
 			# ------------------------------------------------------
 
 			# quit if the user presses Break
-			if ($key =~ /^break$/i) {
+			if ($rawkey =~ /^break$/i) {
                 last MAINLOOP;
             }
 
             # Manage Pause key
-			if ($key =~ /Pause/) {
+			if ($rawkey =~ /Pause/) {
 				if ($ispaused) {
 					$ispaused = 0;
 					xsr::Functions::printinfotranlated("pauseinactif", \%translate);
@@ -364,7 +365,7 @@ MAINLOOP: while (<$XIN>) {
 
 			# add a delay before screenshot when Scroll lock is pressed
 			# or a step when Shift + Scroll lock is pressed
-			if ($key =~ /Scroll_Lock/) {
+			if ($rawkey =~ /Scroll_Lock/i) {
                 if (@mods > 0) {
                     # detect shift modifier pressed
                     my $shiftpressed = 0;
@@ -388,49 +389,68 @@ MAINLOOP: while (<$XIN>) {
                 # Don't memorize Scroll Lock key
                 next;
 			}
-
 			# skip this iteration if the key is a modifier
-			if ($key =~ /$mregex/i) {
+			if ($rawkey =~ /$mregex/i) {
 				next;
 			}
+            #if ($istypedsaved && $rawkey =~ /Return|Enter/i) {
+            if ($rawkey =~ /Return|Enter/i) {
+                print(STDOUT "\n") if $typing && not $quiet;
+                #print(STDOUT "1: $XIN\n");
+
+                (my $shotnumber, $screeni, my $ref_windowgrabs, my $ref_mousegrabs, $istookscreenshot) = xsr::Functions::takescreenshot(\%translate, $xdotool, $composite, $nomouse, \@windowgrabs, \@mousegrabs, $isdelayed, $screenshotmode, $imgext, $quiet, $screeni, $maim, $scrot);
+
+                @windowgrabs = @{$ref_windowgrabs};
+                @mousegrabs = @{$ref_mousegrabs};
+
+                if (not $mytypingtext) {
+                    my $translation = $translate{"type"};
+                    $mytypingtext = "$translation : ";
+                }
+                my $realkey = xsr::Functions::getrealchar($rawkey, \%realchars);
+                $mytypingtext .= "<span class=\"kbd\">$realkey</span>";
+                $mytypingtext .= xsr::Functions::getapptitle($xdotool, \%translate);
+
+                xsr::Functions::printtitleandimage($FOUT, "$shotnumber.$imgext", "$mytypingtext", $islegend);
+
+                $typing = 0;
+                $mytypingtext = "";
+
+                $previouslooptime = gettimeofday();
+
+                next;
+            } # if the user presses return, then end the type instruction and add a screenshot
 
 			# ------------------------------------------------------
 			# Print of typed keys
 			# ------------------------------------------------------
-			# print a type instruction if not already typing, then note that already typing from now on
-			if (! $typing) {
-                my $translation = $translate{"type"};
-                $mytypingtext = "$translation : ";
-                $typing = 1
+			if ($istypedsaved) {
+                # get real char
+                my $realkey = xsr::Functions::getrealchar($rawkey, \%realchars); # get machine-readable name from detail, then get human-readable name from that
+
+                # print a type instruction if not already typing, then note that already typing from now on
+                if (! $typing) {
+                    my $translation = $translate{"type"};
+                    $mytypingtext = "$translation : ";
+                    $typing = 1
+                }
+                if (@mods > 0) {
+                    for (0..$#mods) {
+                        $mytypingtext .= "<span class=\"kbd\">$modifiers{$mods[$_]}</span>+";
+                        print(STDOUT "$modifiers{$mods[$_]}+") if not $quiet;
+                    } # if there are modifiers in effect, print as a sequence of keys
+                    $mytypingtext .= "<span class=\"kbd\">$realkey</span>";
+                    print(STDOUT "$realkey") if not $quiet;
+                }
+                elsif (length($realkey) == 1) {
+                    $mytypingtext .= "$realkey"; # if the realchar of a key is a single character, don't style it as a key
+                    print(STDOUT "$realkey") if not $quiet;
+                }
+                else {
+                    $mytypingtext .= "<span class=\"kbd\">$realkey</span>"; # else style it as a key
+                    print(STDOUT "$realkey") if not $quiet;
+                }
             }
-			if (@mods > 0) {
-				for (0..$#mods) {
-                    $mytypingtext .= "<span class=\"kbd\">$modifiers{$mods[$_]}</span>+";
-                    print(STDOUT "$modifiers{$mods[$_]}+") if not $quiet;
-                } # if there are modifiers in effect, print as a sequence of keys
-				$mytypingtext .= "<span class=\"kbd\">$key</span>";
-				print(STDOUT "$key") if not $quiet;
-			}
-			elsif (length($key) == 1) {
-				$mytypingtext .= "$key"; # if the realchar of a key is a single character, don't style it as a key
-				print(STDOUT "$key") if not $quiet;
-			}
-			else {
-				$mytypingtext .= "<span class=\"kbd\">$key</span>"; # else style it as a key
-				print(STDOUT "$key") if not $quiet;
-			}
-			if ($k{$d} =~ /Return|Enter/i) {
-                print(STDOUT "\n") if $typing && not $quiet;
-                #print(STDOUT "1: $XIN\n");
-				(my $shotnumber, $screeni, my $ref_windowgrabs, my $ref_mousegrabs, $istakescreenshot) = xsr::Functions::takescreenshot(\%translate, $xdotool, $composite, $nomouse, \@windowgrabs, \@mousegrabs, $isdelayed, $screenshotmode, $imgext, $quiet, $screeni, $maim, $scrot);
-
-                @windowgrabs = @{$ref_windowgrabs};
-                @mousegrabs = @{$ref_mousegrabs};
-				xsr::Functions::printtitleandimage($FOUT, "$shotnumber.$imgext", "$mytypingtext", $islegend);
-				$typing = 0; # reprint "Type:" and the like next time
-
-				$fuck = gettimeofday(); # store time of buttonpress
-			} # if the user presses return, then end the type instruction and add a screenshot
         }
 
         # ------------------------------------------------------------
@@ -450,12 +470,13 @@ MAINLOOP: while (<$XIN>) {
 			$movedsince = 0; # haven't moved yet since this button press
 			my $mousebutton = xsr::Functions::getrealbutton($d, \%realbuttons);
 			unless ($d == $lastscroll || $mousebutton =~ /scroll/i) { # only do printing and stuff if this is not a second or later scroll event
-                (my $shotnumber, $screeni, my $ref_windowgrabs, my $ref_mousegrabs, $istakescreenshot) = xsr::Functions::takescreenshot(\%translate, $xdotool, $composite, $nomouse, \@windowgrabs, \@mousegrabs, $isdelayed, $screenshotmode, $imgext, $quiet, $screeni, $maim, $scrot);
+                (my $shotnumber, $screeni, my $ref_windowgrabs, my $ref_mousegrabs, $istookscreenshot) = xsr::Functions::takescreenshot(\%translate, $xdotool, $composite, $nomouse, \@windowgrabs, \@mousegrabs, $isdelayed, $screenshotmode, $imgext, $quiet, $screeni, $maim, $scrot);
 
                 @windowgrabs = @{$ref_windowgrabs};
                 @mousegrabs = @{$ref_mousegrabs};
                 $buttondown = gettimeofday(); # store time of buttonpress
 				my $mytitle = "";
+
 				# get modifiers
 				my @mods;
 				for (0..$#m) {
@@ -482,17 +503,15 @@ MAINLOOP: while (<$XIN>) {
                     $lastscroll = 0
                 }
 				if ($xdotool) { # Add application title
-					my $apptitle = encode_entities(decode(q(UTF-8), `xdotool getwindowfocus getwindowname`));
-					chomp($apptitle);
-					my $field = "in";
-                    $mytitle .= " $translate{$field} <span class=\"apptitle\">$apptitle</span>";
+					$mytitle .= xsr::Functions::getapptitle($xdotool, \%translate);
 				} else {
                     my $field = "notitle";
 					$mytitle .= " ($translate{$field})";
 				}
 
 				xsr::Functions::printtitleandimage($FOUT, "$shotnumber.$imgext", "$mytitle", $islegend);
-				$fuck = gettimeofday(); # store time of buttonpress
+
+				$previouslooptime = gettimeofday();
 			}
 		}
 		elsif ($e =~ /^Motion/) {
@@ -502,14 +521,15 @@ MAINLOOP: while (<$XIN>) {
 			$typing = xsr::Functions::handletypingstate($FOUT, $typing, $quiet, $mytypingtext);
 			if (gettimeofday() - $buttondown >= .075 && $movedsince) { # if we have moved the mouse since clicking and it's been more than 0.075 seconds, recognize it as a click and drag
 																																 # This is very similar to the system default
-				(my $shotnumber, $screeni, my $ref_windowgrabs, my $ref_mousegrabs, $istakescreenshot) = xsr::Functions::takescreenshot(\%translate, $xdotool, $composite, $nomouse, \@windowgrabs, \@mousegrabs, $isdelayed, $screenshotmode, $imgext, $quiet, $screeni, $maim, $scrot);
+				(my $shotnumber, $screeni, my $ref_windowgrabs, my $ref_mousegrabs, $istookscreenshot) = xsr::Functions::takescreenshot(\%translate, $xdotool, $composite, $nomouse, \@windowgrabs, \@mousegrabs, $isdelayed, $screenshotmode, $imgext, $quiet, $screeni, $maim, $scrot);
 
                 @windowgrabs = @{$ref_windowgrabs};
                 @mousegrabs = @{$ref_mousegrabs};
 				my $field = "drag";
 
 				xsr::Functions::printtitleandimage($FOUT, "$shotnumber.$imgext", "$translate{$field}", $islegend);
-				$fuck = gettimeofday(); # store time of buttonpress
+
+				$previouslooptime = gettimeofday();
 			}
 		}
 	}

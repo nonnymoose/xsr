@@ -9,7 +9,7 @@ declare -r TRUE=0
 declare -r FALSE=1
 
 # Script directory
-thedir=`dirname $0`
+thedir=`dirname $(realpath $0)`
 cd "$thedir"
 #thedir=`pwd`
 
@@ -20,6 +20,7 @@ htmleditor="/home/olivier/Logiciels/bluegriffon/bluegriffon"
 fileexplorer="dolphin"
 cssarticle="css/article.css"
 watermark="icons/logo.png"
+lang="fr"
 
 # color definition
 RED='\033[0;31m'
@@ -134,7 +135,7 @@ if [ "$filename" != "" ]; then
     filename="$thedir/html/$filename"
     cssarticle="$thedir/$cssarticle"
 
-    displayMessage "[INFO] Filer $filename" 2
+    displayMessage "[INFO] File $filename" 2
 
     mode="Tutorial mail"
 
@@ -157,31 +158,31 @@ if [ "$filename" != "" ]; then
         case $mode in
             "Tutorial full")
                 echo ">>> Full edition : image + html + files"
-                ./bin/xsr.pl "$filename" --lang=fr -p -e --images-editor="$imageditor" -s --html-editor="$htmleditor" -r --file-explorer="$fileexplorer"
+                ./bin/xsr.pl "$filename" --lang=$lang -p -e --images-editor="$imageditor" -s --html-editor="$htmleditor" -r --file-explorer="$fileexplorer"
                 ;;
             "Tutorial mail")
                 echo ">>> Absolute path of the images to copy paste in an email (-p) + edit: image + html"
-                ./bin/xsr.pl "$filename" --lang=fr -p -e --images-editor="$imageditor" -s --html-editor="$htmleditor"
+                ./bin/xsr.pl "$filename" --lang=$lang -p -e --images-editor="$imageditor" -s --html-editor="$htmleditor"
                 ;;
             "Tutorial watermark")
                 #- 2 -# chemin absolu des images pour copier coller dans un mail (-p) + watermark + on edite : image + html
                 echo ">>> Absolute path of the images to copy paste in an email (-p) + watermark + edit: image + html"
-                ./bin/xsr.pl "$filename" --lang=fr -p -e -a --watermark="$watermark" --images-editor="$imageditor" -s --html-editor="$htmleditor"
+                ./bin/xsr.pl "$filename" --lang=$lang -p -e -a --watermark="$watermark" --images-editor="$imageditor" -s --html-editor="$htmleditor"
                 ;;
             "Tutorial zip")
                 #- 3 -# chemin relatif des images pour pouvoir déplacer le HTML (pas de -p) + on edite : image + html
                 echo ">>> Relative path of images to be able to move the HTML (no -p) + edit: image + html + zip compression"
-                ./bin/xsr.pl "$filename" --lang=fr -e --images-editor="$imageditor" -s --html-editor="$htmleditor"
+                ./bin/xsr.pl "$filename" --lang=$lang -e --images-editor="$imageditor" -s --html-editor="$htmleditor"
                 ;;
             "Manual")
                 #- 2 -# chemin relatif des images + selection + on edite : image + html
                 echo ">>> Relative path of images + selection of screenshots + edit: image + html"
-                ./bin/xsr.pl "$filename" --lang=fr -e --screenshot-mode="select" --images-editor="$imageditor" -s --html-editor="$htmleditor"
+                ./bin/xsr.pl "$filename" --lang=$lang -e --screenshot-mode="select" --images-editor="$imageditor" -s --html-editor="$htmleditor"
                 ;;
             "Article")
                 #- 4 -# chemin relatif des images (pas de -p) et mode article (css article) avec legende (-g) + on edite : image + html
                 echo ">>> Relative path of images (no -p) and article mode (css article) with legend (-g) + edited: image + html"
-                ./bin/xsr.pl "$filename" --lang=fr -p -g --css="$cssarticle" -e --images-editor="$imageditor" -s --html-editor="$htmleditor"
+                ./bin/xsr.pl "$filename" --lang=$lang -p -g --css="$cssarticle" -e --images-editor="$imageditor" -s --html-editor="$htmleditor"
                 ;;
             *)
                 #echo "Unknown mode : $mode"

@@ -7,6 +7,8 @@ use Cwd qw(cwd abs_path);
 use File::Basename;
 use File::Copy qw(copy);
 use File::Path qw(remove_tree);
+use HTML::Entities qw(encode_entities);
+use Encode qw(encode decode);
 use strict;
 use Config::Properties;
 
@@ -32,7 +34,7 @@ Options:
   -o|--out outfile		Output file name with absolute path (also can be first argument) (default: $outfile)
   -l|--lang=code		Language for HTML page (en or fr) (default: $lang)
   -q|--quiet			Suppress output to STDOUT
-  -y|--save-typing		Save typing keys
+  -y|--save-typing		Save typed keys
   -z|--need-final-return	Need to press Return at the end of script
   --countdown[=seconds]		Display countdown (default: $countdown)
   --no-countdown		Don't display countdown
@@ -204,6 +206,23 @@ sub getexternaltool {
 	return $thetool or warn("[WARN] $thetoolname unavailable: $message\n");
 }
 
+sub getapptitle {
+	my ($xdotool, $ref_translate) = @_;
+	my %translate = %{$ref_translate};
+
+    my $apptitle = "";
+    my $mytitle = "";
+
+    if ($xdotool) {
+        $apptitle = encode_entities(decode(q(UTF-8), `xdotool getwindowfocus getwindowname`));
+        chomp($apptitle);
+        my $field = "in";
+        $mytitle = " $translate{$field} <span class=\"apptitle\">$apptitle</span>";
+    }
+
+    return $mytitle;
+}
+
 sub getcursorsize {
     my ($cursor) = @_;
     my $cursorw = 10; # default cursor width
@@ -242,9 +261,18 @@ sub convertToB64 {
 
 # instruction to interact with the application
 sub showinstructions {
-	my ($ref_translate) = @_;
+	my ($ref_translate, $istypedsaved) = @_;
 	my %translate = %{$ref_translate};
     printinfomessage("=============================================================");
+    printinfotranlated("instruction", \%translate);
+    printinfomessage("=============================================================");
+    printinfotranlated("screenshot", \%translate);
+    if ($istypedsaved) {
+        printinfotranlated("keypress", \%translate);
+    }
+    else {
+        printinfotranlated("textblock", \%translate);
+    }
     printinfotranlated("pressscrolllock", \%translate);
     printinfotranlated("pressshiftscrolllock", \%translate);
     printinfotranlated("presspause", \%translate);
@@ -258,15 +286,15 @@ sub printinfomessage {
 }
 
 sub getrealchar { # function that makes using the above hash easier
-	my ($keycode, $ref_realchars) = @_;
+	my ($rawkey, $ref_realchars) = @_;
 	my %realchars = %{$ref_realchars};
-	#print(STDOUT "[DEBUG] Keycode = $keycode\n");
-	$keycode =~ s/KP_//i; # remove any number pad designation
-	if ($realchars{$keycode}) {
-		return $realchars{$keycode}; # make sure to only return the value if it's in the array (many aren't because the machine-readable name is also human-readable)
+	#print(STDOUT "[DEBUG] Keycode = $rawkey\n");
+	$rawkey =~ s/KP_//i; # remove any number pad designation
+	if ($realchars{$rawkey}) {
+		return $realchars{$rawkey}; # make sure to only return the value if it's in the array (many aren't because the machine-readable name is also human-readable)
 	}
 	else {
-		return $keycode;
+		return $rawkey;
 	}
 }
 
@@ -567,5 +595,33 @@ sub viewwithfileexplorer {
         #print(STDOUT "Show $outfiledir with $fileexplorer. Press return when finished.\n") if not $quiet;
         #<STDIN>
     }
+}
+
+sub addheader {
+    my ($FOUT, $outfilename_noext, $mycsscontents) = @_;
+
+    print $FOUT <<"/html";
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>$outfilename_noext</title>
+    <meta charset="UTF-8" />
+	</head>
+	<body>
+        <style>$mycsscontents</style>
+		<h1>$outfilename_noext</h1>
+/html
+}
+
+sub addfooter {
+    my ($FOUT) = @_;
+
+	print $FOUT <<"/html";
+		<div class="footer">
+			<i>Made using <a href="https://github.com/olivierlab/xsr" target="_blank">X Steps Recorder</a>.</i>
+		</div>
+	</body>
+</html>
+/html
 }
 1;

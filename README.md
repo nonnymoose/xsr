@@ -21,9 +21,9 @@ Make sure you have `scrot` (direct screenshot), `maim` (screenshot with selectio
 
 I recommend that you have `xdotool` (mouse position) and `imagemagick` (to add pointer to screenshots) installed as well.
 
-If you want to use the bash script `xsr.sh`, install `zenity` (dialog box) and `pandoc` (convert from HTML to md) then edit it and update the default file names zone.
+If you want to use the bash script `xsr.sh`, install `zenity` (dialog box), `pandoc` (convert from HTML to md) and `zip` (compress HTML and image) then edit it and update the default file names zone.
 
-For `xsr.desktop`, change keys `Exec`, `Icon` and `Path`.
+For `xsr.desktop`, update keys `Exec`, `Icon` and `Path` with the path where you install xsr.
 
 # New things compared with original fork
 
@@ -42,10 +42,6 @@ Press on `Shift + Pause` to quit recording.
 # Usage
 
 ```
-Description:
-   ./bin/xsr.pl is a clone of PSR for Windows, a program that allows users to make a recording of all of the steps they took. It's like a screen recorder that doesn't record a video.
-   It records your keystrokes too (!), and it saves the output as standard html (base64-uri-encoded images). This allows for easy editing of the resultant file, such as to remove passwords you typed.
-
 Usage:
     ./bin/xsr.pl [options] outfile
 
@@ -55,6 +51,7 @@ Options:
   -o|--out outfile		Output file name with absolute path (also can be first argument) (default: ./html/Untitled Recording.html)
   -l|--lang=code		Language for HTML page (en or fr) (default: en)
   -q|--quiet			Suppress output to STDOUT
+  -y|--save-typing		Save typed keys
   -z|--need-final-return	Need to press Return at the end of script
   --countdown[=seconds]		Display countdown (default: 5)
   --no-countdown		Don't display countdown
@@ -69,7 +66,7 @@ Options:
   -u|--screenshot-mode		Screenshot mode : all (all the desktop), select (a selection) or focus (the focused window) (default: focus)
   --mouse-icon|--cursor=file	Specify cursor image (default: ./cursor/default.png)
   --no-mouse			Do not add mouse to screenshots
-  -w|--watermark=file	Specify watermark image (default: none)
+  -w|--watermark=file	Specify watermark image (default: ./icons/logo.png)
   -a|--add-watermark			Add watermark to screenshots
 
   HTML:
@@ -111,3 +108,8 @@ Without `-p` option, images have relative path. Usefull if you need to move the 
 `./bin/xsr.pl "./html/save.html" --screenshot-mode="select" -e --images-editor="your-img-editor" -s --html-editor="your-html-editor"`
 
 Enjoy.
+
+# Notes for this file
+__Please don't edit this file (`README.md`) directly!__
+Please edit rather `README.md.m4`, and run `make README.md` after.
+You can commit the generated changes in `README.md` along with the manual changes in `README.md.m4`.
