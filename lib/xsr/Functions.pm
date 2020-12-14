@@ -321,15 +321,18 @@ sub printtitleandimage {
 
     print($FOUT "<div class=\"instruction full\">\n");
     printonlytitle($FOUT, $mytitle, "") if not $islegend;
-    printimage($FOUT, "$myimage");
+    printimage($FOUT, "$myimage", "$mytitle");
     printonlytitle($FOUT, $mytitle, "") if $islegend;
     print($FOUT "</div>\n");
 }
 
 sub printimage {
-    my ($FOUT, $myimage) = @_;
+    my ($FOUT, $myimage, $mytitle) = @_;
 
-    print($FOUT "<div class=\"image\"><img src=\"$myimage\" /></div>\n");
+    print(STDOUT "$myimage\n");
+    $mytitle =~ s/<.*>(.*)<\/.*>/$1/g; # remove HTML code
+
+    print($FOUT "<div class=\"image\"><img alt=\"$mytitle\" src=\"$myimage\" /></div>\n");
 }
 
 sub printtitle {
@@ -509,10 +512,10 @@ sub writefinalfileintohtml {
         while (<$ASSOCFILE>) {
             if ($imageabspath) {
                 # absolute path
-                $_ =~ s/<img src=\"([^\"]+)\" \/>/<img src=\"file:\/\/$outfiledir$outfilename_noext\/$1\" \/>/gi; # replace <img> tags' src attr with relative path to images
+                $_ =~ s/<img alt=\"([^\"]+)\" src=\"([^\"]+)\" \/>/<img alt=\"$1\" src=\"file:\/\/$outfiledir$outfilename_noext\/$2\" \/>/gi; # replace <img> tags' src attr with relative path to images
             } else {
                 # relative path
-                $_ =~ s/<img src=\"([^\"]+)\" \/>/<img src=\"$outfilename_noext\/$1\" \/>/gi; # replace <img> tags' src attr with relative path to images
+                $_ =~ s/<img alt=\"([^\"]+)\" src=\"([^\"]+)\" \/>/<img alt=\"$1\" src=\"$outfilename_noext\/$2\" \/>/gi; # replace <img> tags' src attr with relative path to images
             }
             print($FINALFILE $_);
         }
