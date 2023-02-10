@@ -7,8 +7,13 @@ The main differences are that this only runs on Linux, that it records your keys
 
 # Installation
 
-See the [Releases Page](https://github.com/nonnymoose/xsr/releases).
-Make sure you have `scrot` installed; I recommend that you have `imagemagick` and `xdotool` installed as well (to add pointer to screenshots).
+Run the **install.sh** script like so:
+```
+sudo sh install.sh
+```
+
+# Dependencies
+Needs gnome-screenshot in order to run properly. It does get installed when running the `install.sh` script
 
 # Usage
 
@@ -30,8 +35,3 @@ Options:
   -h|--help			Print this message
 ```
 To quit, press `Break` (usually `Shift`+`Pause`). `Ctrl`+`C` works most of time fine too, although xsr will record that keypress.
-
-# Notes for this file
-__Please don't edit this file (`README.md`) directly!__
-Please edit rather `README.md.m4`, and run `make README.md` after.
-You can commit the generated changes in `README.md` along with the manual changes in `README.md.m4`.
