@@ -282,7 +282,7 @@ sub takescreenshot {
 		my $curmouseloc = `xdotool getmouselocation`;
 		push(@mousegrabs, $curmouseloc);
 	}
-	system("gnome-screenshot -f $screeni.$imgext &");
+	system("gnome-screenshot".( $focusedcap ? " -w" : "" )." -f $screeni.$imgext &");
 	return $screeni++;
 }
 
