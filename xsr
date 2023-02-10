@@ -119,9 +119,10 @@ if (not $nomouse) {
 	chomp($composite);
 	$composite or warn("composite unavailable: mouse cursor will not appear in screenshots\n");
 }
-my $scrot = `which scrot`;
-chomp($scrot);
-$scrot or die("scrot unavailable: cannot take screenshots\n");
+my $gnome = `which gnome-screenshot`;
+
+chomp($gnome);
+$gnome or die("gnome-screenshot unavailable: cannot take screenshots\n");
 
 
 sub convertToB64 {
@@ -145,7 +146,7 @@ sub finish {
 		handletypingstate();
 		print $FOUT <<"/html";
 		<div class="footer">
-			<i>Made using <a href="https://github.com/nonnymoose/xsr">X Steps Recorder</a>.</i>
+			<i>Made using <a href="https://github.com/MaximeLaroche/xsr-ubuntu-22.04">X Steps Recorder</a>.</i>
 		</div>
 	</body>
 </html>
@@ -281,7 +282,7 @@ sub takescreenshot {
 		my $curmouseloc = `xdotool getmouselocation`;
 		push(@mousegrabs, $curmouseloc);
 	}
-	system("scrot".( $focusedcap ? " --focused" : "" )." $screeni.$imgext &");
+	system("gnome-screenshot".( $focusedcap ? " -w" : "" )." -f $screeni.$imgext &");
 	return $screeni++;
 }
 
