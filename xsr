@@ -146,7 +146,7 @@ sub finish {
 		handletypingstate();
 		print $FOUT <<"/html";
 		<div class="footer">
-			<i>Made using <a href="https://github.com/nonnymoose/xsr">X Steps Recorder</a>.</i>
+			<i>Made using <a href="https://github.com/MaximeLaroche/xsr-ubuntu-22.04">X Steps Recorder</a>.</i>
 		</div>
 	</body>
 </html>
