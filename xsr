@@ -13,7 +13,10 @@ use strict;
 use warnings;
 use Getopt::Long;
 
-my $outfile = "Untitled Recording.html";
+my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime(time);
+my $timestamp = sprintf ( "%04d%02d%02d-%02d%02d%02d", $year+1900,$mon+1,$mday,$hour,$min,$sec);
+
+my $outfile = "XSR_Recording-$timestamp.html";
 my $FOUT; # output filehandle
 my $XIN;
 my $verbose = 0;
